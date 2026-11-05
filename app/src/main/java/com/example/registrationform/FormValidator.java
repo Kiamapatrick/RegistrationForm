@@ -1,7 +1,5 @@
 package com.example.registrationform;
 
-import android.annotation.SuppressLint;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -75,7 +73,6 @@ public final class FormValidator {
      * Rules: required, not in the future (uses UTC for comparison).
      * @param dobUtcMillis Date of birth in UTC milliseconds, or null if not selected.
      */
-    @SuppressLint("NewApi")
     public static ValidationResult validateDob(Long dobUtcMillis) {
         if (dobUtcMillis == null) {
             return ValidationResult.invalid(Error.DOB_REQUIRED);
