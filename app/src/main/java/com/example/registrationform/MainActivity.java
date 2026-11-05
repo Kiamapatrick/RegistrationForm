@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     private void restoreDatePickerIfShowing() {
         MaterialDatePicker<Long> existingPicker = (MaterialDatePicker<Long>) getSupportFragmentManager()
                 .findFragmentByTag("DATE_PICKER");
-        if (existingPicker != null && existingPicker.isVisible()) {
+        if (existingPicker != null && existingPicker.isAdded()) {
             isDatePickerShowing = true;
             attachDatePickerListeners(existingPicker);
         }
