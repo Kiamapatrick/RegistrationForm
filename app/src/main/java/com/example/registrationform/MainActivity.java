@@ -21,7 +21,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -226,12 +225,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateName() {
-        String name = etName.getText() != null ? etName.getText().toString().trim() : "";
-        if (TextUtils.isEmpty(name)) {
-            tilName.setError(getString(R.string.error_name_required));
-            return false;
-        } else if (name.length() < 2) {
-            tilName.setError(getString(R.string.error_name_min_length));
+        String name = etName.getText() != null ? etName.getText().toString() : "";
+        FormValidator.ValidationResult result = FormValidator.validateName(name);
+        if (!result.isValid()) {
+            tilName.setError(getErrorString(result.error));
             return false;
         } else {
             tilName.setError(null);
@@ -240,9 +237,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateDob() {
-        String dob = etDob.getText() != null ? etDob.getText().toString().trim() : "";
-        if (TextUtils.isEmpty(dob)) {
-            tilDob.setError(getString(R.string.error_dob_required));
+        FormValidator.ValidationResult result = FormValidator.validateDob(selectedDobUtcMillis);
+        if (!result.isValid()) {
+            tilDob.setError(getErrorString(result.error));
             return false;
         } else {
             tilDob.setError(null);
@@ -251,12 +248,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateEmail() {
-        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
-        if (TextUtils.isEmpty(email)) {
-            tilEmail.setError(getString(R.string.error_email_required));
-            return false;
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError(getString(R.string.error_email_invalid));
+        String email = etEmail.getText() != null ? etEmail.getText().toString() : "";
+        FormValidator.ValidationResult result = FormValidator.validateEmail(email);
+        if (!result.isValid()) {
+            tilEmail.setError(getErrorString(result.error));
             return false;
         } else {
             tilEmail.setError(null);
@@ -264,14 +259,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateButtonState() {
-        boolean isNameValid = !TextUtils.isEmpty(etName.getText() != null ? etName.getText().toString().trim() : "") &&
-                etName.getText().toString().trim().length() >= 2;
-        boolean isDobValid = selectedDobUtcMillis != null;
-        boolean isEmailValid = !TextUtils.isEmpty(etEmail.getText() != null ? etEmail.getText().toString().trim() : "") &&
-                android.util.Patterns.EMAIL_ADDRESS.matcher(etEmail.getText().toString().trim()).matches();
+    private String getErrorString(FormValidator.Error error) {
+        switch (error) {
+            case NAME_REQUIRED:
+                return getString(R.string.error_name_required);
+            case NAME_TOO_SHORT:
+                return getString(R.string.error_name_min_length);
+            case DOB_REQUIRED:
+                return getString(R.string.error_dob_required);
+            case DOB_FUTURE:
+                return getString(R.string.error_dob_required); // Reuse existing string for future date
+            case EMAIL_REQUIRED:
+                return getString(R.string.error_email_required);
+            case EMAIL_INVALID:
+                return getString(R.string.error_email_invalid);
+            default:
+                return "";
+        }
+    }
 
-        boolean allValid = isNameValid && isDobValid && isEmailValid;
+    private void updateButtonState() {
+        String name = etName.getText() != null ? etName.getText().toString() : "";
+        String email = etEmail.getText() != null ? etEmail.getText().toString() : "";
+
+        FormValidator.ValidationResult nameResult = FormValidator.validateName(name);
+        FormValidator.ValidationResult dobResult = FormValidator.validateDob(selectedDobUtcMillis);
+        FormValidator.ValidationResult emailResult = FormValidator.validateEmail(email);
+
+        boolean allValid = nameResult.isValid() && dobResult.isValid() && emailResult.isValid();
         btnNext.setEnabled(allValid);
     }
 }

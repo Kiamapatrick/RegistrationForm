@@ -23,3 +23,7 @@ Thumbs.db
 
 # Log files
 *.log
+
+# Plan/Agent files (local only)
+AGENTS.md
+OPENCODE_PLAN.md
