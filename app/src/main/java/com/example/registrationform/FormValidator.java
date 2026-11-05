@@ -13,6 +13,9 @@ public final class FormValidator {
 
     private FormValidator() {}
 
+    /** Minimum age in years for registration. */
+    public static final int MIN_AGE_YEARS = 18;
+
     /** Validation error types. */
     public enum Error {
         NONE,
@@ -20,6 +23,7 @@ public final class FormValidator {
         NAME_TOO_SHORT,
         DOB_REQUIRED,
         DOB_FUTURE,
+        DOB_UNDER_AGE,
         EMAIL_REQUIRED,
         EMAIL_INVALID
     }
@@ -70,18 +74,32 @@ public final class FormValidator {
 
     /**
      * Validates the date of birth field.
-     * Rules: required, not in the future (uses UTC for comparison).
+     * Rules: required, not in the future (uses UTC for comparison), minimum age (18 years).
      * @param dobUtcMillis Date of birth in UTC milliseconds, or null if not selected.
      */
     public static ValidationResult validateDob(Long dobUtcMillis) {
+        return validateDobForTesting(dobUtcMillis, LocalDate.now(ZoneOffset.UTC));
+    }
+
+    /**
+     * Validates the date of birth field with a specific "today" date (for testing).
+     * @param dobUtcMillis Date of birth in UTC milliseconds, or null if not selected.
+     * @param today The reference date to compare against (in UTC).
+     */
+    static ValidationResult validateDobForTesting(Long dobUtcMillis, LocalDate today) {
         if (dobUtcMillis == null) {
             return ValidationResult.invalid(Error.DOB_REQUIRED);
         }
         // Convert UTC millis to LocalDate in UTC
         LocalDate dob = Instant.ofEpochMilli(dobUtcMillis).atOffset(ZoneOffset.UTC).toLocalDate();
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
         if (dob.isAfter(today)) {
             return ValidationResult.invalid(Error.DOB_FUTURE);
+        }
+        // Check minimum age: person must have had their 18th birthday on or before today
+        // This correctly handles leap day birthdays (Feb 29 -> Mar 1 in non-leap years)
+        LocalDate eighteenthBirthday = dob.plusYears(MIN_AGE_YEARS);
+        if (eighteenthBirthday.isAfter(today)) {
+            return ValidationResult.invalid(Error.DOB_UNDER_AGE);
         }
         return ValidationResult.valid();
     }

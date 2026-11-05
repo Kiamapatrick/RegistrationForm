@@ -7,6 +7,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+
 import static org.junit.Assert.*;
 
 public class RegistrationViewModelTest {
@@ -102,12 +105,53 @@ public class RegistrationViewModelTest {
     }
 
     @Test
-    public void dobValidation_today_isValid() {
+    public void dobValidation_today_isUnderAge() {
+        // Today is not a valid DOB for someone 18+ (would be 0 years old)
         long today = java.time.Instant.now().toEpochMilli();
         viewModel.setDobUtcMillis(today);
         viewModel.setDobTouched(true);
 
-        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.DOB_UNDER_AGE, getValue(viewModel.getDobError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void dobValidation_exact18thBirthdayToday_isValid() {
+        // Use a fixed date to avoid flakiness: Jan 15, 2024 -> 18th birthday is Jan 15, 2042
+        // But we test with "today" = Jan 15, 2042 and dob = Jan 15, 2024
+        LocalDate today = LocalDate.of(2042, 1, 15);
+        LocalDate dob = today.minusYears(18); // Jan 15, 2024
+        long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        long todayMillis = today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        
+        FormValidator.ValidationResult result = FormValidator.validateDobForTesting(dobMillis, today);
+        assertTrue("Should be valid on exact 18th birthday", result.isValid());
+    }
+
+    @Test
+    public void dobValidation_oneDayShortOf18_showsUnderAgeError() {
+        // Born 18 years and 1 day ago - one day short of 18
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        LocalDate dob = today.minusYears(18).plusDays(1);
+        long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        viewModel.setDobUtcMillis(dobMillis);
+        viewModel.setDobTouched(true);
+
+        assertEquals(FormValidator.Error.DOB_UNDER_AGE, getValue(viewModel.getDobError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void dobValidation_leapDayBirthday() {
+        // Born on Feb 29, 2008 (leap year) - Java's plusYears(18) gives Feb 28, 2026 (non-leap year)
+        // So on Feb 28, 2026 they turn 18, on Feb 27, 2026 they are still 17
+        LocalDate today = LocalDate.of(2026, 2, 27);
+        LocalDate dob = LocalDate.of(2008, 2, 29);
+        long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        
+        FormValidator.ValidationResult result = FormValidator.validateDobForTesting(dobMillis, today);
+        assertFalse("Should be under age on Feb 27, 2026 (born Feb 29, 2008)", result.isValid());
+        assertEquals(FormValidator.Error.DOB_UNDER_AGE, result.error);
     }
 
     @Test

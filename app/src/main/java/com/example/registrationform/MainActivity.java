@@ -274,6 +274,8 @@ public class MainActivity extends AppCompatActivity {
                 return R.string.error_dob_required;
             case DOB_FUTURE:
                 return R.string.error_dob_future;
+            case DOB_UNDER_AGE:
+                return R.string.error_dob_under_age;
             case EMAIL_REQUIRED:
                 return R.string.error_email_required;
             case EMAIL_INVALID:
