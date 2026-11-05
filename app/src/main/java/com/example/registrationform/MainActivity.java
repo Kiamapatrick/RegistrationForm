@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         // Create calendar constraints: past dates up to 18 years ago
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
         constraintsBuilder.setValidator(DateValidatorPointBackward.before(maxDateUtcMillis));
+        constraintsBuilder.setEnd(maxDateUtcMillis);
 
         // Default selection: if no date selected yet, open on the max date (18 years ago)
         long defaultSelection = viewModel.getDobUtcMillis() != null

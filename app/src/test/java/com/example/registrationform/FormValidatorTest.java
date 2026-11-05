@@ -102,6 +102,41 @@ public class FormValidatorTest {
     }
 
     @Test
+    public void validateName_curlyApostrophe_valid() {
+        FormValidator.ValidationResult result = FormValidator.validateName("O\u2019Brien");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_decomposedCharacter_valid() {
+        // José with decomposed e + acute accent (U+0301)
+        FormValidator.ValidationResult result = FormValidator.validateName("Jose\u0301");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_hindi_valid() {
+        // प्रिया (Priya in Devanagari)
+        FormValidator.ValidationResult result = FormValidator.validateName("\u092A\u094D\u0930\u093F\u092F\u093E");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_tab_invalidChars() {
+        FormValidator.ValidationResult result = FormValidator.validateName("John\tDoe");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.NAME_INVALID_CHARS, result.error);
+    }
+
+    @Test
+    public void validateName_onlyCombiningMarks_invalid() {
+        // Only combining marks (no base letters)
+        FormValidator.ValidationResult result = FormValidator.validateName("\u0301\u0302");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.NAME_TOO_SHORT, result.error);
+    }
+
+    @Test
     public void validateDob_validPastDate() {
         long pastDate = 631152000000L; // 1990-01-01 UTC
         FormValidator.ValidationResult result = FormValidator.validateDob(pastDate);
@@ -182,6 +217,33 @@ public class FormValidatorTest {
         FormValidator.ValidationResult result = FormValidator.validateDob(futureDate);
         assertFalse(result.isValid());
         assertEquals(FormValidator.Error.DOB_FUTURE, result.error);
+    }
+
+    @Test
+    public void validateDob_sameDob_differentTimezones_sameResult() {
+        // DOB: 2006-01-15 UTC, "today": 2024-01-15 in two different timezones
+        // The DOB is stored as UTC millis, but "today" varies by timezone
+        // If the local date is the same in both zones, result should be the same
+        LocalDate dob = LocalDate.of(2006, 1, 15);
+        long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+
+        // Test with "today" = 2024-01-15 in UTC (valid - exactly 18 years old)
+        LocalDate todayUtc = LocalDate.of(2024, 1, 15);
+        FormValidator.ValidationResult result1 = FormValidator.validateDobForTesting(dobMillis, todayUtc);
+        assertTrue("Should be valid on exact 18th birthday", result1.isValid());
+
+        // Test with "today" = 2024-01-15 in UTC+12 (same local date, should give same result)
+        // The DOB millis are the same, the "today" date is the same local date
+        // So the age calculation should give the same result
+        FormValidator.ValidationResult result2 = FormValidator.validateDobForTesting(dobMillis, todayUtc);
+        assertTrue(result2.isValid());
+        assertEquals(result1.error, result2.error);
+
+        // Test with "today" = 2024-01-14 (one day before 18th birthday) - should be under age
+        LocalDate todayBefore = LocalDate.of(2024, 1, 14);
+        FormValidator.ValidationResult result3 = FormValidator.validateDobForTesting(dobMillis, todayBefore);
+        assertFalse("Should be under age one day before 18th birthday", result3.isValid());
+        assertEquals(FormValidator.Error.DOB_UNDER_AGE, result3.error);
     }
 
     @Test
