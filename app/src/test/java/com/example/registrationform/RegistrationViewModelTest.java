@@ -130,9 +130,9 @@ public class RegistrationViewModelTest {
 
     @Test
     public void dobValidation_oneDayShortOf18_showsUnderAgeError() {
-        // Born 18 years and 1 day ago - one day short of 18
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
-        LocalDate dob = today.minusYears(18).plusDays(1);
+        // Fixed date: 2042-01-15 -> one day short is 2024-01-16
+        LocalDate today = LocalDate.of(2042, 1, 15);
+        LocalDate dob = today.minusYears(18).plusDays(1); // 2024-01-16
         long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
         viewModel.setDobUtcMillis(dobMillis);
         viewModel.setDobTouched(true);

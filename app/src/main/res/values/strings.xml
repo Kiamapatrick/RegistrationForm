@@ -9,7 +9,8 @@
     <!-- Name Field -->
     <string name="hint_full_name">Full Name</string>
     <string name="error_name_required">Please enter your name</string>
-    <string name="error_name_min_length">Name must be at least 2 characters</string>
+    <string name="error_name_min_length">Name must contain at least 2 letters</string>
+    <string name="error_name_invalid">Name can only contain letters, spaces, hyphens and apostrophes</string>
     <string name="content_desc_name">Full name input field</string>
 
     <!-- Date of Birth Field -->

@@ -21,6 +21,7 @@ public final class FormValidator {
         NONE,
         NAME_REQUIRED,
         NAME_TOO_SHORT,
+        NAME_INVALID_CHARS,
         DOB_REQUIRED,
         DOB_FUTURE,
         DOB_UNDER_AGE,
@@ -56,7 +57,8 @@ public final class FormValidator {
 
     /**
      * Validates the full name field.
-     * Rules: required, trimmed, minimum 2 characters.
+     * Rules: required, trimmed, must contain only Unicode letters, spaces, hyphens, apostrophes and dots,
+     * and must contain at least 2 letters.
      */
     public static ValidationResult validateName(String name) {
         if (name == null) {
@@ -66,7 +68,13 @@ public final class FormValidator {
         if (trimmed.isEmpty()) {
             return ValidationResult.invalid(Error.NAME_REQUIRED);
         }
-        if (trimmed.length() < 2) {
+        // Check for invalid characters: only Unicode letters, spaces, hyphens, apostrophes, dots allowed
+        if (!trimmed.matches("[\\p{L}\\s\\-'.]+")) {
+            return ValidationResult.invalid(Error.NAME_INVALID_CHARS);
+        }
+        // Count letters (must have at least 2)
+        long letterCount = trimmed.codePoints().filter(Character::isLetter).count();
+        if (letterCount < 2) {
             return ValidationResult.invalid(Error.NAME_TOO_SHORT);
         }
         return ValidationResult.valid();
@@ -96,7 +104,8 @@ public final class FormValidator {
             return ValidationResult.invalid(Error.DOB_FUTURE);
         }
         // Check minimum age: person must have had their 18th birthday on or before today
-        // This correctly handles leap day birthdays (Feb 29 -> Mar 1 in non-leap years)
+        // This correctly handles leap day birthdays (Feb 29 -> Feb 28 in non-leap years per Java's plusYears).
+        // This is a deliberate lenient choice: a person born on Feb 29 legally turns 18 on Feb 28 in non-leap years.
         LocalDate eighteenthBirthday = dob.plusYears(MIN_AGE_YEARS);
         if (eighteenthBirthday.isAfter(today)) {
             return ValidationResult.invalid(Error.DOB_UNDER_AGE);

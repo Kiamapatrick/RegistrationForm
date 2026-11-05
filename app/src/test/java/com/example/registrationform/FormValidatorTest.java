@@ -23,6 +23,51 @@ public class FormValidatorTest {
     }
 
     @Test
+    public void validateName_validWithHyphen() {
+        FormValidator.ValidationResult result = FormValidator.validateName("Jean-Luc");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_validWithApostrophe() {
+        FormValidator.ValidationResult result = FormValidator.validateName("O'Brien");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_validWithMultipleSpaces() {
+        FormValidator.ValidationResult result = FormValidator.validateName("Wanjiru Kamau");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_validWithUnicodeLetter() {
+        FormValidator.ValidationResult result = FormValidator.validateName("Müller");
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    public void validateName_emoji_invalidChars() {
+        FormValidator.ValidationResult result = FormValidator.validateName("John 😀");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.NAME_INVALID_CHARS, result.error);
+    }
+
+    @Test
+    public void validateName_digits_invalidChars() {
+        FormValidator.ValidationResult result = FormValidator.validateName("John123");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.NAME_INVALID_CHARS, result.error);
+    }
+
+    @Test
+    public void validateName_singleLetter_tooShort() {
+        FormValidator.ValidationResult result = FormValidator.validateName("A");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.NAME_TOO_SHORT, result.error);
+    }
+
+    @Test
     public void validateName_empty() {
         FormValidator.ValidationResult result = FormValidator.validateName("");
         assertFalse(result.isValid());
@@ -73,22 +118,22 @@ public class FormValidatorTest {
     }
 
     @Test
-    public void validateDob_exact18thBirthdayToday_isValid() {
-        // Born exactly 18 years ago today
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
-        LocalDate dob = today.minusYears(18);
+    public void validateDob_exact18thBirthday_isValid() {
+        // Fixed date: 2024-01-15 -> 18th birthday is 2042-01-15
+        LocalDate today = LocalDate.of(2042, 1, 15);
+        LocalDate dob = today.minusYears(18); // 2024-01-15
         long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-        FormValidator.ValidationResult result = FormValidator.validateDob(dobMillis);
+        FormValidator.ValidationResult result = FormValidator.validateDobForTesting(dobMillis, today);
         assertTrue("Should be valid on exact 18th birthday", result.isValid());
     }
 
     @Test
     public void validateDob_oneDayShortOf18_isUnderAge() {
-        // Born 18 years and 1 day ago - one day short of 18
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
-        LocalDate dob = today.minusYears(18).plusDays(1);
+        // Fixed date: 2024-01-15 -> one day short is 2024-01-16
+        LocalDate today = LocalDate.of(2042, 1, 15);
+        LocalDate dob = today.minusYears(18).plusDays(1); // 2024-01-16
         long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-        FormValidator.ValidationResult result = FormValidator.validateDob(dobMillis);
+        FormValidator.ValidationResult result = FormValidator.validateDobForTesting(dobMillis, today);
         assertFalse("Should be invalid - one day short of 18", result.isValid());
         assertEquals(FormValidator.Error.DOB_UNDER_AGE, result.error);
     }
