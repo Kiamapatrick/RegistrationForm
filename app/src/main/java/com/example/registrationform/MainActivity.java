@@ -58,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         setupNextButton();
         observeViewModel();
         syncViewsFromViewModel();
+
+        // Restore date picker listeners if picker is already showing (e.g., after rotation)
+        restoreDatePickerIfShowing();
     }
 
     private void initViews() {
@@ -107,6 +110,17 @@ public class MainActivity extends AppCompatActivity {
                 .setCalendarConstraints(constraintsBuilder.build())
                 .build();
 
+        attachDatePickerListeners(datePicker);
+
+        datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+    }
+
+    /**
+     * Attach positive button and dismiss listeners to a date picker.
+     * Shared between creating a new picker and restoring an existing one after rotation.
+     */
+    @SuppressWarnings("unchecked")
+    private void attachDatePickerListeners(MaterialDatePicker<Long> datePicker) {
         datePicker.addOnPositiveButtonClickListener(selection -> {
             viewModel.setDobUtcMillis(selection);
             updateDobField();
@@ -120,14 +134,22 @@ public class MainActivity extends AppCompatActivity {
             // Dialog dismissed
         });
 
-        datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-
-        // Reset guard after a short delay to allow the dialog to fully show
-        // Using a simple flag reset after the dialog is shown
-        // MaterialDatePicker handles its own lifecycle, so we reset when it's dismissed
         datePicker.addOnDismissListener(dialog -> {
             isDatePickerShowing = false;
         });
+    }
+
+    /**
+     * If a date picker is already showing (e.g., after rotation), find it and re-attach listeners.
+     */
+    @SuppressWarnings("unchecked")
+    private void restoreDatePickerIfShowing() {
+        MaterialDatePicker<Long> existingPicker = (MaterialDatePicker<Long>) getSupportFragmentManager()
+                .findFragmentByTag("DATE_PICKER");
+        if (existingPicker != null && existingPicker.isVisible()) {
+            isDatePickerShowing = true;
+            attachDatePickerListeners(existingPicker);
+        }
     }
 
     private void updateDobField() {
@@ -208,8 +230,8 @@ public class MainActivity extends AppCompatActivity {
     private void observeViewModel() {
         // Observe name error
         viewModel.getNameError().observe(this, error -> {
-            if (error != null) {
-                tilName.setError(getString(getResources().getIdentifier(error, "string", getPackageName())));
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilName.setError(getString(errorToStringRes(error)));
             } else {
                 tilName.setError(null);
             }
@@ -217,8 +239,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Observe DOB error
         viewModel.getDobError().observe(this, error -> {
-            if (error != null) {
-                tilDob.setError(getString(getResources().getIdentifier(error, "string", getPackageName())));
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilDob.setError(getString(errorToStringRes(error)));
             } else {
                 tilDob.setError(null);
             }
@@ -226,8 +248,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Observe email error
         viewModel.getEmailError().observe(this, error -> {
-            if (error != null) {
-                tilEmail.setError(getString(getResources().getIdentifier(error, "string", getPackageName())));
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilEmail.setError(getString(errorToStringRes(error)));
             } else {
                 tilEmail.setError(null);
             }
@@ -237,6 +259,28 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getIsFormValid().observe(this, isValid -> {
             btnNext.setEnabled(Boolean.TRUE.equals(isValid));
         });
+    }
+
+    /**
+     * Map a FormValidator.Error to its corresponding string resource ID.
+     */
+    private int errorToStringRes(FormValidator.Error error) {
+        switch (error) {
+            case NAME_REQUIRED:
+                return R.string.error_name_required;
+            case NAME_TOO_SHORT:
+                return R.string.error_name_min_length;
+            case DOB_REQUIRED:
+                return R.string.error_dob_required;
+            case DOB_FUTURE:
+                return R.string.error_dob_future;
+            case EMAIL_REQUIRED:
+                return R.string.error_email_required;
+            case EMAIL_INVALID:
+                return R.string.error_email_invalid;
+            default:
+                return 0;
+        }
     }
 
     private void syncViewsFromViewModel() {

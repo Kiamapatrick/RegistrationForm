@@ -30,10 +30,10 @@ public class RegistrationViewModelTest {
         assertFalse(viewModel.isDobTouched());
         assertFalse(viewModel.isEmailTouched());
 
-        // Initially no errors
-        assertNull(getValue(viewModel.getNameError()));
-        assertNull(getValue(viewModel.getDobError()));
-        assertNull(getValue(viewModel.getEmailError()));
+        // Initially no errors (NONE means valid)
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getEmailError()));
 
         // Form is not valid initially (empty fields)
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
@@ -44,7 +44,7 @@ public class RegistrationViewModelTest {
         viewModel.setName("");
         viewModel.setNameTouched(true);
 
-        assertEquals("error_name_required", getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NAME_REQUIRED, getValue(viewModel.getNameError()));
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
     }
 
@@ -53,7 +53,7 @@ public class RegistrationViewModelTest {
         viewModel.setName("A");
         viewModel.setNameTouched(true);
 
-        assertEquals("error_name_min_length", getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NAME_TOO_SHORT, getValue(viewModel.getNameError()));
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
     }
 
@@ -62,7 +62,7 @@ public class RegistrationViewModelTest {
         viewModel.setName("John");
         viewModel.setNameTouched(true);
 
-        assertNull(getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class RegistrationViewModelTest {
         viewModel.setName("   ");
         viewModel.setNameTouched(true);
 
-        assertEquals("error_name_required", getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NAME_REQUIRED, getValue(viewModel.getNameError()));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class RegistrationViewModelTest {
         viewModel.setDobUtcMillis(null);
         viewModel.setDobTouched(true);
 
-        assertEquals("error_dob_required", getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.DOB_REQUIRED, getValue(viewModel.getDobError()));
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
     }
 
@@ -88,7 +88,7 @@ public class RegistrationViewModelTest {
         viewModel.setDobUtcMillis(pastDate);
         viewModel.setDobTouched(true);
 
-        assertNull(getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
     }
 
     @Test
@@ -97,8 +97,17 @@ public class RegistrationViewModelTest {
         viewModel.setDobUtcMillis(futureDate);
         viewModel.setDobTouched(true);
 
-        assertEquals("error_dob_required", getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.DOB_FUTURE, getValue(viewModel.getDobError()));
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void dobValidation_today_isValid() {
+        long today = java.time.Instant.now().toEpochMilli();
+        viewModel.setDobUtcMillis(today);
+        viewModel.setDobTouched(true);
+
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
     }
 
     @Test
@@ -106,7 +115,7 @@ public class RegistrationViewModelTest {
         viewModel.setEmail("");
         viewModel.setEmailTouched(true);
 
-        assertEquals("error_email_required", getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.EMAIL_REQUIRED, getValue(viewModel.getEmailError()));
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
     }
 
@@ -115,7 +124,7 @@ public class RegistrationViewModelTest {
         viewModel.setEmail("invalid-email");
         viewModel.setEmailTouched(true);
 
-        assertEquals("error_email_invalid", getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.EMAIL_INVALID, getValue(viewModel.getEmailError()));
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
     }
 
@@ -124,7 +133,7 @@ public class RegistrationViewModelTest {
         viewModel.setEmail("user@example.com");
         viewModel.setEmailTouched(true);
 
-        assertNull(getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getEmailError()));
     }
 
     @Test
@@ -137,9 +146,9 @@ public class RegistrationViewModelTest {
         viewModel.setEmailTouched(true);
 
         assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
-        assertNull(getValue(viewModel.getNameError()));
-        assertNull(getValue(viewModel.getDobError()));
-        assertNull(getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getEmailError()));
     }
 
     @Test
@@ -152,7 +161,7 @@ public class RegistrationViewModelTest {
         viewModel.setEmailTouched(true);
 
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
-        assertEquals("error_dob_required", getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.DOB_REQUIRED, getValue(viewModel.getDobError()));
     }
 
     @Test
@@ -165,7 +174,7 @@ public class RegistrationViewModelTest {
         viewModel.setEmailTouched(true);
 
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
-        assertEquals("error_email_required", getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.EMAIL_REQUIRED, getValue(viewModel.getEmailError()));
     }
 
     @Test
@@ -181,9 +190,9 @@ public class RegistrationViewModelTest {
         assertTrue(viewModel.isEmailTouched());
 
         // All errors should be visible now
-        assertEquals("error_name_min_length", getValue(viewModel.getNameError()));
-        assertEquals("error_dob_required", getValue(viewModel.getDobError()));
-        assertEquals("error_email_invalid", getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NAME_TOO_SHORT, getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.DOB_REQUIRED, getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.EMAIL_INVALID, getValue(viewModel.getEmailError()));
     }
 
     @Test
@@ -207,7 +216,7 @@ public class RegistrationViewModelTest {
 
         // Create new ViewModel instance (simulating Activity recreation)
         RegistrationViewModel newViewModel = new RegistrationViewModel();
-        
+
         // Copy state (in real app, ViewModel survives; here we test the data model)
         newViewModel.setName(viewModel.getName());
         newViewModel.setDobUtcMillis(viewModel.getDobUtcMillis());
@@ -224,16 +233,19 @@ public class RegistrationViewModelTest {
         assertTrue(newViewModel.isDobTouched());
         assertTrue(newViewModel.isEmailTouched());
         assertTrue(Boolean.TRUE.equals(getValue(newViewModel.getIsFormValid())));
+        assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getDobError()));
+        assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getEmailError()));
     }
 
     @Test
     public void errorClearedWhenFieldBecomesValid() {
         viewModel.setName("A");
         viewModel.setNameTouched(true);
-        assertEquals("error_name_min_length", getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NAME_TOO_SHORT, getValue(viewModel.getNameError()));
 
         viewModel.setName("Valid Name");
-        assertNull(getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
     }
 
     @Test
@@ -243,10 +255,10 @@ public class RegistrationViewModelTest {
         viewModel.setDobUtcMillis(null);
         // Don't set touched flags
 
-        // Errors should be null even though fields are invalid
-        assertNull(getValue(viewModel.getNameError()));
-        assertNull(getValue(viewModel.getEmailError()));
-        assertNull(getValue(viewModel.getDobError()));
+        // Errors should be NONE even though fields are invalid
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
 
         // But form should still be invalid
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));

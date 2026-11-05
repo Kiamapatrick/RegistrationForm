@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.Objects;
-
 /**
  * ViewModel for the registration form.
  * Holds form state (name, DOB, email, touched flags) and exposes LiveData for UI observation.
@@ -23,10 +21,10 @@ public class RegistrationViewModel extends ViewModel {
     private boolean dobTouched = false;
     private boolean emailTouched = false;
 
-    // LiveData for field errors (null = no error)
-    private final MutableLiveData<String> nameError = new MutableLiveData<>();
-    private final MutableLiveData<String> dobError = new MutableLiveData<>();
-    private final MutableLiveData<String> emailError = new MutableLiveData<>();
+    // LiveData for field errors (NONE = valid, specific error = invalid after touched)
+    private final MutableLiveData<FormValidator.Error> nameError = new MutableLiveData<>(FormValidator.Error.NONE);
+    private final MutableLiveData<FormValidator.Error> dobError = new MutableLiveData<>(FormValidator.Error.NONE);
+    private final MutableLiveData<FormValidator.Error> emailError = new MutableLiveData<>(FormValidator.Error.NONE);
 
     // LiveData for form validity
     private final MutableLiveData<Boolean> isFormValid = new MutableLiveData<>(false);
@@ -57,15 +55,15 @@ public class RegistrationViewModel extends ViewModel {
     }
 
     // LiveData getters for observation
-    public LiveData<String> getNameError() {
+    public LiveData<FormValidator.Error> getNameError() {
         return nameError;
     }
 
-    public LiveData<String> getDobError() {
+    public LiveData<FormValidator.Error> getDobError() {
         return dobError;
     }
 
-    public LiveData<String> getEmailError() {
+    public LiveData<FormValidator.Error> getEmailError() {
         return emailError;
     }
 
@@ -123,68 +121,29 @@ public class RegistrationViewModel extends ViewModel {
         // Validate name
         FormValidator.ValidationResult nameResult = FormValidator.validateName(name);
         if (nameTouched && !nameResult.isValid()) {
-            nameError.setValue(mapErrorToString(nameResult.error));
+            nameError.setValue(nameResult.error);
         } else {
-            nameError.setValue(null);
+            nameError.setValue(FormValidator.Error.NONE);
         }
 
         // Validate DOB
         FormValidator.ValidationResult dobResult = FormValidator.validateDob(dobUtcMillis);
         if (dobTouched && !dobResult.isValid()) {
-            dobError.setValue(mapErrorToString(dobResult.error));
+            dobError.setValue(dobResult.error);
         } else {
-            dobError.setValue(null);
+            dobError.setValue(FormValidator.Error.NONE);
         }
 
         // Validate email
         FormValidator.ValidationResult emailResult = FormValidator.validateEmail(email);
         if (emailTouched && !emailResult.isValid()) {
-            emailError.setValue(mapErrorToString(emailResult.error));
+            emailError.setValue(emailResult.error);
         } else {
-            emailError.setValue(null);
+            emailError.setValue(FormValidator.Error.NONE);
         }
 
         // Update form validity (all fields must be valid, regardless of touched state)
         boolean allValid = nameResult.isValid() && dobResult.isValid() && emailResult.isValid();
         isFormValid.setValue(allValid);
-    }
-
-    // Map FormValidator.Error to string resource key (Activity will resolve to actual string)
-    private String mapErrorToString(FormValidator.Error error) {
-        switch (error) {
-            case NAME_REQUIRED:
-                return "error_name_required";
-            case NAME_TOO_SHORT:
-                return "error_name_min_length";
-            case DOB_REQUIRED:
-                return "error_dob_required";
-            case DOB_FUTURE:
-                return "error_dob_required"; // Reuse existing string for future date
-            case EMAIL_REQUIRED:
-                return "error_email_required";
-            case EMAIL_INVALID:
-                return "error_email_invalid";
-            default:
-                return "";
-        }
-    }
-
-    // Helper to check if form data equals another ViewModel's data (for testing)
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RegistrationViewModel that = (RegistrationViewModel) o;
-        return nameTouched == that.nameTouched &&
-                dobTouched == that.dobTouched &&
-                emailTouched == that.emailTouched &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(dobUtcMillis, that.dobUtcMillis) &&
-                Objects.equals(email, that.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, dobUtcMillis, email, nameTouched, dobTouched, emailTouched);
     }
 }
