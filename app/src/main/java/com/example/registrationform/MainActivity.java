@@ -21,6 +21,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -100,13 +103,25 @@ public class MainActivity extends AppCompatActivity {
         isDatePickerShowing = true;
         viewModel.setDobTouched(true);
 
-        // Create calendar constraints: only past dates up to today
+        // Calculate max date: 18 years ago from today (in UTC millis)
+        long todayUtcMillis = MaterialDatePicker.todayInUtcMilliseconds();
+        LocalDate today = Instant.ofEpochMilli(todayUtcMillis).atOffset(ZoneOffset.UTC).toLocalDate();
+        LocalDate eighteenYearsAgo = today.minusYears(FormValidator.MIN_AGE_YEARS);
+        long maxDateUtcMillis = eighteenYearsAgo.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+
+        // Create calendar constraints: past dates up to 18 years ago
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-        constraintsBuilder.setValidator(DateValidatorPointBackward.now());
+        constraintsBuilder.setValidator(DateValidatorPointBackward.before(maxDateUtcMillis));
+        constraintsBuilder.setEnd(maxDateUtcMillis);
+
+        // Default selection: if no date selected yet, open on the max date (18 years ago)
+        long defaultSelection = viewModel.getDobUtcMillis() != null
+                ? viewModel.getDobUtcMillis()
+                : maxDateUtcMillis;
 
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText(getString(R.string.hint_date_of_birth))
-                .setSelection(viewModel.getDobUtcMillis() != null ? viewModel.getDobUtcMillis() : MaterialDatePicker.todayInUtcMilliseconds())
+                .setSelection(defaultSelection)
                 .setCalendarConstraints(constraintsBuilder.build())
                 .build();
 
@@ -270,10 +285,14 @@ public class MainActivity extends AppCompatActivity {
                 return R.string.error_name_required;
             case NAME_TOO_SHORT:
                 return R.string.error_name_min_length;
+            case NAME_INVALID_CHARS:
+                return R.string.error_name_invalid;
             case DOB_REQUIRED:
                 return R.string.error_dob_required;
             case DOB_FUTURE:
                 return R.string.error_dob_future;
+            case DOB_UNDER_AGE:
+                return R.string.error_dob_under_age;
             case EMAIL_REQUIRED:
                 return R.string.error_email_required;
             case EMAIL_INVALID:
