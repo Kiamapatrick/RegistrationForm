@@ -7,6 +7,8 @@
     <dimen name="title_subtitle_spacing">8dp</dimen>
     <dimen name="title_to_fields_spacing">32dp</dimen>
     <dimen name="button_top_margin">32dp</dimen>
+    <dimen name="strength_margin_top">8dp</dimen>
+    <dimen name="strength_label_margin">8dp</dimen>
 
     <!-- Corner radius -->
     <dimen name="corner_radius">12dp</dimen>

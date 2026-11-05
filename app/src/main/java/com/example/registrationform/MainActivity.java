@@ -17,8 +17,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -32,10 +34,16 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText etName;
     private TextInputEditText etDob;
     private TextInputEditText etEmail;
+    private TextInputEditText etPassword;
+    private TextInputEditText etConfirmPassword;
     private MaterialButton btnNext;
     private TextInputLayout tilName;
     private TextInputLayout tilDob;
     private TextInputLayout tilEmail;
+    private TextInputLayout tilPassword;
+    private TextInputLayout tilConfirmPassword;
+    private LinearProgressIndicator passwordStrengthBar;
+    private MaterialTextView passwordStrengthLabel;
 
     // Guard against double date picker opening
     private boolean isDatePickerShowing = false;
@@ -70,10 +78,16 @@ public class MainActivity extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         etDob = findViewById(R.id.etDob);
         etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnNext = findViewById(R.id.btnNext);
         tilName = findViewById(R.id.tilName);
         tilDob = findViewById(R.id.tilDob);
         tilEmail = findViewById(R.id.tilEmail);
+        tilPassword = findViewById(R.id.tilPassword);
+        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
+        passwordStrengthBar = findViewById(R.id.passwordStrengthBar);
+        passwordStrengthLabel = findViewById(R.id.passwordStrengthLabel);
     }
 
     private void setupDatePicker() {
@@ -218,6 +232,46 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Password field watcher
+        etPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.setPassword(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        etPassword.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                viewModel.setPasswordTouched(true);
+            }
+        });
+
+        // Confirm Password field watcher
+        etConfirmPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.setConfirmPassword(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        etConfirmPassword.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                viewModel.setConfirmPasswordTouched(true);
+            }
+        });
+
         // DOB field doesn't need a text watcher since it's not editable
         // But we track touch for validation via the date picker
     }
@@ -270,6 +324,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Observe password error
+        viewModel.getPasswordError().observe(this, error -> {
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilPassword.setError(getString(errorToStringRes(error)));
+            } else {
+                tilPassword.setError(null);
+            }
+        });
+
+        // Observe confirm password error
+        viewModel.getConfirmPasswordError().observe(this, error -> {
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilConfirmPassword.setError(getString(errorToStringRes(error)));
+            } else {
+                tilConfirmPassword.setError(null);
+            }
+        });
+
+        // Observe password strength
+        viewModel.getPasswordStrengthProgress().observe(this, progress -> {
+            if (progress != null) {
+                passwordStrengthBar.setProgress(progress, true);
+            }
+        });
+
+        viewModel.getPasswordStrengthLabel().observe(this, label -> {
+            if (label != null && !label.isEmpty()) {
+                passwordStrengthLabel.setText(label);
+                passwordStrengthLabel.setVisibility(View.VISIBLE);
+            } else {
+                passwordStrengthLabel.setVisibility(View.GONE);
+            }
+        });
+
         // Observe form validity for button state
         viewModel.getIsFormValid().observe(this, isValid -> {
             btnNext.setEnabled(Boolean.TRUE.equals(isValid));
@@ -297,6 +385,18 @@ public class MainActivity extends AppCompatActivity {
                 return R.string.error_email_required;
             case EMAIL_INVALID:
                 return R.string.error_email_invalid;
+            case PASSWORD_REQUIRED:
+                return R.string.error_password_required;
+            case PASSWORD_TOO_SHORT:
+                return R.string.error_password_too_short;
+            case PASSWORD_MISSING_LETTER:
+                return R.string.error_password_missing_letter;
+            case PASSWORD_MISSING_DIGIT:
+                return R.string.error_password_missing_digit;
+            case PASSWORD_MISMATCH:
+                return R.string.error_password_mismatch;
+            case CONFIRM_REQUIRED:
+                return R.string.error_confirm_required;
             default:
                 return 0;
         }
@@ -318,6 +418,18 @@ public class MainActivity extends AppCompatActivity {
         if (viewModel.getEmail() != null && !viewModel.getEmail().isEmpty()) {
             etEmail.setText(viewModel.getEmail());
             etEmail.setSelection(viewModel.getEmail().length());
+        }
+
+        // Sync password
+        if (viewModel.getPassword() != null && !viewModel.getPassword().isEmpty()) {
+            etPassword.setText(viewModel.getPassword());
+            etPassword.setSelection(viewModel.getPassword().length());
+        }
+
+        // Sync confirm password
+        if (viewModel.getConfirmPassword() != null && !viewModel.getConfirmPassword().isEmpty()) {
+            etConfirmPassword.setText(viewModel.getConfirmPassword());
+            etConfirmPassword.setSelection(viewModel.getConfirmPassword().length());
         }
     }
 }
