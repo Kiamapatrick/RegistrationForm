@@ -2,7 +2,6 @@ package com.example.registrationform;
 
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
@@ -12,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -34,16 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private TextInputLayout tilDob;
     private TextInputLayout tilEmail;
 
-    // Track user interaction to show errors only after interaction
-    private boolean nameTouched = false;
-    private boolean dobTouched = false;
-    private boolean emailTouched = false;
-
     // Guard against double date picker opening
     private boolean isDatePickerShowing = false;
 
-    // Selected date in UTC millis (from MaterialDatePicker)
-    private Long selectedDobUtcMillis = null;
+    private RegistrationViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +50,17 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        viewModel = new ViewModelProvider(this).get(RegistrationViewModel.class);
+
         initViews();
         setupDatePicker();
         setupTextWatchers();
         setupNextButton();
+        observeViewModel();
+        syncViewsFromViewModel();
+
+        // Restore date picker listeners if picker is already showing (e.g., after rotation)
+        restoreDatePickerIfShowing();
     }
 
     private void initViews() {
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showDatePickerDialog() {
         isDatePickerShowing = true;
-        dobTouched = true;
+        viewModel.setDobTouched(true);
 
         // Create calendar constraints: only past dates up to today
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
@@ -105,12 +106,23 @@ public class MainActivity extends AppCompatActivity {
 
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText(getString(R.string.hint_date_of_birth))
-                .setSelection(selectedDobUtcMillis != null ? selectedDobUtcMillis : MaterialDatePicker.todayInUtcMilliseconds())
+                .setSelection(viewModel.getDobUtcMillis() != null ? viewModel.getDobUtcMillis() : MaterialDatePicker.todayInUtcMilliseconds())
                 .setCalendarConstraints(constraintsBuilder.build())
                 .build();
 
+        attachDatePickerListeners(datePicker);
+
+        datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+    }
+
+    /**
+     * Attach positive button and dismiss listeners to a date picker.
+     * Shared between creating a new picker and restoring an existing one after rotation.
+     */
+    @SuppressWarnings("unchecked")
+    private void attachDatePickerListeners(MaterialDatePicker<Long> datePicker) {
         datePicker.addOnPositiveButtonClickListener(selection -> {
-            selectedDobUtcMillis = selection;
+            viewModel.setDobUtcMillis(selection);
             updateDobField();
         });
 
@@ -122,22 +134,30 @@ public class MainActivity extends AppCompatActivity {
             // Dialog dismissed
         });
 
-        datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-
-        // Reset guard after a short delay to allow the dialog to fully show
-        // Using a simple flag reset after the dialog is shown
-        // MaterialDatePicker handles its own lifecycle, so we reset when it's dismissed
         datePicker.addOnDismissListener(dialog -> {
             isDatePickerShowing = false;
         });
     }
 
+    /**
+     * If a date picker is already showing (e.g., after rotation), find it and re-attach listeners.
+     */
+    @SuppressWarnings("unchecked")
+    private void restoreDatePickerIfShowing() {
+        MaterialDatePicker<Long> existingPicker = (MaterialDatePicker<Long>) getSupportFragmentManager()
+                .findFragmentByTag("DATE_PICKER");
+        if (existingPicker != null && existingPicker.isAdded()) {
+            isDatePickerShowing = true;
+            attachDatePickerListeners(existingPicker);
+        }
+    }
+
     private void updateDobField() {
-        if (selectedDobUtcMillis != null) {
+        if (viewModel.getDobUtcMillis() != null) {
             // MaterialDatePicker returns UTC millis, so format with UTC timezone to avoid off-by-one-day bug
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            etDob.setText(sdf.format(selectedDobUtcMillis));
+            etDob.setText(sdf.format(viewModel.getDobUtcMillis()));
             tilDob.setError(null);
         }
     }
@@ -150,10 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (nameTouched) {
-                    validateName();
-                }
-                updateButtonState();
+                viewModel.setName(s.toString());
             }
 
             @Override
@@ -162,8 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
         etName.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                nameTouched = true;
-                validateName();
+                viewModel.setNameTouched(true);
             }
         });
 
@@ -174,10 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (emailTouched) {
-                    validateEmail();
-                }
-                updateButtonState();
+                viewModel.setEmail(s.toString());
             }
 
             @Override
@@ -186,27 +199,20 @@ public class MainActivity extends AppCompatActivity {
 
         etEmail.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                emailTouched = true;
-                validateEmail();
+                viewModel.setEmailTouched(true);
             }
         });
 
         // DOB field doesn't need a text watcher since it's not editable
-        // But we track touch for validation
+        // But we track touch for validation via the date picker
     }
 
     private void setupNextButton() {
         btnNext.setOnClickListener(v -> {
             // Validate all fields on submit
-            nameTouched = true;
-            dobTouched = true;
-            emailTouched = true;
+            viewModel.setAllTouched();
 
-            boolean isNameValid = validateName();
-            boolean isDobValid = validateDob();
-            boolean isEmailValid = validateEmail();
-
-            if (isNameValid && isDobValid && isEmailValid) {
+            if (Boolean.TRUE.equals(viewModel.getIsFormValid().getValue())) {
                 // Form is valid - proceed to next step
                 String name = etName.getText().toString().trim();
                 String dob = etDob.getText().toString().trim();
@@ -219,74 +225,80 @@ public class MainActivity extends AppCompatActivity {
                 // TODO: Navigate to next screen or process registration
             }
         });
-
-        // Initial button state
-        updateButtonState();
     }
 
-    private boolean validateName() {
-        String name = etName.getText() != null ? etName.getText().toString() : "";
-        FormValidator.ValidationResult result = FormValidator.validateName(name);
-        if (!result.isValid()) {
-            tilName.setError(getErrorString(result.error));
-            return false;
-        } else {
-            tilName.setError(null);
-            return true;
-        }
+    private void observeViewModel() {
+        // Observe name error
+        viewModel.getNameError().observe(this, error -> {
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilName.setError(getString(errorToStringRes(error)));
+            } else {
+                tilName.setError(null);
+            }
+        });
+
+        // Observe DOB error
+        viewModel.getDobError().observe(this, error -> {
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilDob.setError(getString(errorToStringRes(error)));
+            } else {
+                tilDob.setError(null);
+            }
+        });
+
+        // Observe email error
+        viewModel.getEmailError().observe(this, error -> {
+            if (error != null && error != FormValidator.Error.NONE) {
+                tilEmail.setError(getString(errorToStringRes(error)));
+            } else {
+                tilEmail.setError(null);
+            }
+        });
+
+        // Observe form validity for button state
+        viewModel.getIsFormValid().observe(this, isValid -> {
+            btnNext.setEnabled(Boolean.TRUE.equals(isValid));
+        });
     }
 
-    private boolean validateDob() {
-        FormValidator.ValidationResult result = FormValidator.validateDob(selectedDobUtcMillis);
-        if (!result.isValid()) {
-            tilDob.setError(getErrorString(result.error));
-            return false;
-        } else {
-            tilDob.setError(null);
-            return true;
-        }
-    }
-
-    private boolean validateEmail() {
-        String email = etEmail.getText() != null ? etEmail.getText().toString() : "";
-        FormValidator.ValidationResult result = FormValidator.validateEmail(email);
-        if (!result.isValid()) {
-            tilEmail.setError(getErrorString(result.error));
-            return false;
-        } else {
-            tilEmail.setError(null);
-            return true;
-        }
-    }
-
-    private String getErrorString(FormValidator.Error error) {
+    /**
+     * Map a FormValidator.Error to its corresponding string resource ID.
+     */
+    private int errorToStringRes(FormValidator.Error error) {
         switch (error) {
             case NAME_REQUIRED:
-                return getString(R.string.error_name_required);
+                return R.string.error_name_required;
             case NAME_TOO_SHORT:
-                return getString(R.string.error_name_min_length);
+                return R.string.error_name_min_length;
             case DOB_REQUIRED:
-                return getString(R.string.error_dob_required);
+                return R.string.error_dob_required;
             case DOB_FUTURE:
-                return getString(R.string.error_dob_required); // Reuse existing string for future date
+                return R.string.error_dob_future;
             case EMAIL_REQUIRED:
-                return getString(R.string.error_email_required);
+                return R.string.error_email_required;
             case EMAIL_INVALID:
-                return getString(R.string.error_email_invalid);
+                return R.string.error_email_invalid;
             default:
-                return "";
+                return 0;
         }
     }
 
-    private void updateButtonState() {
-        String name = etName.getText() != null ? etName.getText().toString() : "";
-        String email = etEmail.getText() != null ? etEmail.getText().toString() : "";
+    private void syncViewsFromViewModel() {
+        // Sync name
+        if (viewModel.getName() != null && !viewModel.getName().isEmpty()) {
+            etName.setText(viewModel.getName());
+            etName.setSelection(viewModel.getName().length());
+        }
 
-        FormValidator.ValidationResult nameResult = FormValidator.validateName(name);
-        FormValidator.ValidationResult dobResult = FormValidator.validateDob(selectedDobUtcMillis);
-        FormValidator.ValidationResult emailResult = FormValidator.validateEmail(email);
+        // Sync DOB
+        if (viewModel.getDobUtcMillis() != null) {
+            updateDobField();
+        }
 
-        boolean allValid = nameResult.isValid() && dobResult.isValid() && emailResult.isValid();
-        btnNext.setEnabled(allValid);
+        // Sync email
+        if (viewModel.getEmail() != null && !viewModel.getEmail().isEmpty()) {
+            etEmail.setText(viewModel.getEmail());
+            etEmail.setSelection(viewModel.getEmail().length());
+        }
     }
 }
