@@ -80,19 +80,4 @@ public class PasswordStrengthTest {
     public void progress_strong_100() {
         assertEquals(100, PasswordStrength.progress("Password123!"));
     }
-
-    @Test
-    public void label_weak() {
-        assertEquals("Weak", PasswordStrength.label(PasswordStrength.Level.WEAK));
-    }
-
-    @Test
-    public void label_fair() {
-        assertEquals("Fair", PasswordStrength.label(PasswordStrength.Level.FAIR));
-    }
-
-    @Test
-    public void label_strong() {
-        assertEquals("Strong", PasswordStrength.label(PasswordStrength.Level.STRONG));
-    }
 }

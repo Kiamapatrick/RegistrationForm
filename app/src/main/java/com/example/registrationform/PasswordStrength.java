@@ -88,15 +88,4 @@ public final class PasswordStrength {
         }
     }
 
-    /**
-     * Returns a label for the strength level.
-     */
-    public static String label(Level level) {
-        switch (level) {
-            case WEAK: return "Weak";
-            case FAIR: return "Fair";
-            case STRONG: return "Strong";
-            default: return "";
-        }
     }
-}

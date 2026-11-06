@@ -34,7 +34,7 @@ public class RegistrationViewModel extends ViewModel {
 
     // LiveData for password strength
     private final MutableLiveData<Integer> passwordStrengthProgress = new MutableLiveData<>(0);
-    private final MutableLiveData<String> passwordStrengthLabel = new MutableLiveData<>("");
+    private final MutableLiveData<PasswordStrength.Level> passwordStrengthLevel = new MutableLiveData<>(PasswordStrength.Level.WEAK);
 
     // LiveData for form validity
     private final MutableLiveData<Boolean> isFormValid = new MutableLiveData<>(false);
@@ -105,8 +105,8 @@ public class RegistrationViewModel extends ViewModel {
         return passwordStrengthProgress;
     }
 
-    public LiveData<String> getPasswordStrengthLabel() {
-        return passwordStrengthLabel;
+    public LiveData<PasswordStrength.Level> getPasswordStrengthLevel() {
+        return passwordStrengthLevel;
     }
 
     public LiveData<Boolean> getIsFormValid() {
@@ -188,7 +188,7 @@ public class RegistrationViewModel extends ViewModel {
     private void updatePasswordStrength() {
         PasswordStrength.Level level = PasswordStrength.evaluate(password);
         passwordStrengthProgress.setValue(PasswordStrength.progress(password));
-        passwordStrengthLabel.setValue(PasswordStrength.label(level));
+        passwordStrengthLevel.setValue(level);
     }
 
     // Validate all fields and update LiveData

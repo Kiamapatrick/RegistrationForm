@@ -188,9 +188,9 @@ public class RegistrationViewModelTest {
         viewModel.setDobTouched(true);
         viewModel.setEmail("john@example.com");
         viewModel.setEmailTouched(true);
-        viewModel.setPassword("Password1");
+        viewModel.setPassword("MySecure1");
         viewModel.setPasswordTouched(true);
-        viewModel.setConfirmPassword("Password1");
+        viewModel.setConfirmPassword("MySecure1");
         viewModel.setConfirmPasswordTouched(true);
 
         assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
@@ -251,8 +251,8 @@ public class RegistrationViewModelTest {
         viewModel.setName("Jane Smith");
         viewModel.setDobUtcMillis(631152000000L); // 1990-01-01 UTC
         viewModel.setEmail("jane@example.com");
-        viewModel.setPassword("Password1");
-        viewModel.setConfirmPassword("Password1");
+        viewModel.setPassword("MySecure1");
+        viewModel.setConfirmPassword("MySecure1");
         viewModel.setNameTouched(true);
         viewModel.setDobTouched(true);
         viewModel.setEmailTouched(true);
@@ -263,8 +263,8 @@ public class RegistrationViewModelTest {
         assertEquals("Jane Smith", viewModel.getName());
         assertEquals(631152000000L, viewModel.getDobUtcMillis().longValue());
         assertEquals("jane@example.com", viewModel.getEmail());
-        assertEquals("Password1", viewModel.getPassword());
-        assertEquals("Password1", viewModel.getConfirmPassword());
+        assertEquals("MySecure1", viewModel.getPassword());
+        assertEquals("MySecure1", viewModel.getConfirmPassword());
         assertTrue(viewModel.isNameTouched());
         assertTrue(viewModel.isDobTouched());
         assertTrue(viewModel.isEmailTouched());
@@ -291,8 +291,8 @@ public class RegistrationViewModelTest {
         assertEquals("Jane Smith", newViewModel.getName());
         assertEquals(631152000000L, newViewModel.getDobUtcMillis().longValue());
         assertEquals("jane@example.com", newViewModel.getEmail());
-        assertEquals("Password1", newViewModel.getPassword());
-        assertEquals("Password1", newViewModel.getConfirmPassword());
+        assertEquals("MySecure1", newViewModel.getPassword());
+        assertEquals("MySecure1", newViewModel.getConfirmPassword());
         assertTrue(newViewModel.isNameTouched());
         assertTrue(newViewModel.isDobTouched());
         assertTrue(newViewModel.isEmailTouched());
@@ -370,7 +370,7 @@ public class RegistrationViewModelTest {
 
     @Test
     public void passwordValidation_valid_clearsError() {
-        viewModel.setPassword("Password1");
+        viewModel.setPassword("MySecure1");
         viewModel.setPasswordTouched(true);
 
         assertEquals(FormValidator.Error.NONE, getValue(viewModel.getPasswordError()));
@@ -406,6 +406,24 @@ public class RegistrationViewModelTest {
     }
 
     @Test
+    public void passwordValidation_edgeSpaces_showsErrorAfterTouched() {
+        viewModel.setPassword(" Password1");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_HAS_EDGE_SPACES, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_commonPassword_showsErrorAfterTouched() {
+        viewModel.setPassword("password1");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
     public void formValid_allFieldsIncludingPassword_returnsTrue() {
         viewModel.setName("John Doe");
         viewModel.setNameTouched(true);
@@ -413,9 +431,9 @@ public class RegistrationViewModelTest {
         viewModel.setDobTouched(true);
         viewModel.setEmail("john@example.com");
         viewModel.setEmailTouched(true);
-        viewModel.setPassword("Password1");
+        viewModel.setPassword("MySecure1");
         viewModel.setPasswordTouched(true);
-        viewModel.setConfirmPassword("Password1");
+        viewModel.setConfirmPassword("MySecure1");
         viewModel.setConfirmPasswordTouched(true);
 
         assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
@@ -433,7 +451,7 @@ public class RegistrationViewModelTest {
         viewModel.setEmailTouched(true);
         viewModel.setPassword("");
         viewModel.setPasswordTouched(true);
-        viewModel.setConfirmPassword("Password1");
+        viewModel.setConfirmPassword("MySecure1");
         viewModel.setConfirmPasswordTouched(true);
 
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
@@ -448,9 +466,9 @@ public class RegistrationViewModelTest {
         viewModel.setDobTouched(true);
         viewModel.setEmail("john@example.com");
         viewModel.setEmailTouched(true);
-        viewModel.setPassword("Password1");
+        viewModel.setPassword("MySecure1");
         viewModel.setPasswordTouched(true);
-        viewModel.setConfirmPassword("Password2");
+        viewModel.setConfirmPassword("MySecure2");
         viewModel.setConfirmPasswordTouched(true);
 
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
@@ -461,15 +479,15 @@ public class RegistrationViewModelTest {
     public void passwordStrength_updatesOnPasswordChange() {
         viewModel.setPassword("abc");
         assertEquals(Integer.valueOf(25), getValue(viewModel.getPasswordStrengthProgress()));
-        assertEquals("Weak", getValue(viewModel.getPasswordStrengthLabel()));
+        assertEquals(PasswordStrength.Level.WEAK, getValue(viewModel.getPasswordStrengthLevel()));
 
         viewModel.setPassword("Password1");
         assertEquals(Integer.valueOf(60), getValue(viewModel.getPasswordStrengthProgress()));
-        assertEquals("Fair", getValue(viewModel.getPasswordStrengthLabel()));
+        assertEquals(PasswordStrength.Level.FAIR, getValue(viewModel.getPasswordStrengthLevel()));
 
         viewModel.setPassword("Password123!");
         assertEquals(Integer.valueOf(100), getValue(viewModel.getPasswordStrengthProgress()));
-        assertEquals("Strong", getValue(viewModel.getPasswordStrengthLabel()));
+        assertEquals(PasswordStrength.Level.STRONG, getValue(viewModel.getPasswordStrengthLevel()));
     }
 
     @Test
@@ -479,7 +497,7 @@ public class RegistrationViewModelTest {
 
         viewModel.setPassword("");
         assertEquals(Integer.valueOf(0), getValue(viewModel.getPasswordStrengthProgress()));
-        assertEquals("Weak", getValue(viewModel.getPasswordStrengthLabel()));
+        assertEquals(PasswordStrength.Level.WEAK, getValue(viewModel.getPasswordStrengthLevel()));
     }
 
     @Test

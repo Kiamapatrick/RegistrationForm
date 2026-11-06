@@ -207,7 +207,7 @@
                 android:inputType="textPassword"
                 android:imeOptions="actionDone"
                 android:maxLines="1"
-                android:autofillHints="password"
+                android:autofillHints="newPassword"
                 android:contentDescription="@string/content_desc_confirm_password" />
 
         </com.google.android.material.textfield.TextInputLayout>

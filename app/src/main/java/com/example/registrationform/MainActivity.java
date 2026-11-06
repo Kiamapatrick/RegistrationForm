@@ -349,9 +349,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.getPasswordStrengthLabel().observe(this, label -> {
-            if (label != null && !label.isEmpty()) {
-                passwordStrengthLabel.setText(label);
+        viewModel.getPasswordStrengthLevel().observe(this, level -> {
+            if (level != null) {
+                int stringRes;
+                switch (level) {
+                    case WEAK:
+                        stringRes = R.string.password_strength_weak;
+                        break;
+                    case FAIR:
+                        stringRes = R.string.password_strength_fair;
+                        break;
+                    case STRONG:
+                        stringRes = R.string.password_strength_strong;
+                        break;
+                    default:
+                        stringRes = R.string.password_strength_weak;
+                }
+                passwordStrengthLabel.setText(stringRes);
                 passwordStrengthLabel.setVisibility(View.VISIBLE);
             } else {
                 passwordStrengthLabel.setVisibility(View.GONE);
@@ -393,6 +407,10 @@ public class MainActivity extends AppCompatActivity {
                 return R.string.error_password_missing_letter;
             case PASSWORD_MISSING_DIGIT:
                 return R.string.error_password_missing_digit;
+            case PASSWORD_HAS_EDGE_SPACES:
+                return R.string.error_password_edge_spaces;
+            case PASSWORD_TOO_COMMON:
+                return R.string.error_password_common;
             case PASSWORD_MISMATCH:
                 return R.string.error_password_mismatch;
             case CONFIRM_REQUIRED:

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -33,7 +34,8 @@ public final class FormValidator {
         PASSWORD_TOO_SHORT,
         PASSWORD_MISSING_LETTER,
         PASSWORD_MISSING_DIGIT,
-        PASSWORD_MATCH_REQUIRED,
+        PASSWORD_HAS_EDGE_SPACES,
+        PASSWORD_TOO_COMMON,
         PASSWORD_MISMATCH,
         CONFIRM_REQUIRED
     }
@@ -62,6 +64,15 @@ public final class FormValidator {
     // Email regex pattern (RFC 5322 simplified)
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+    );
+
+    // Common passwords to reject (case-insensitive)
+    private static final Set<String> COMMON_PASSWORDS = Set.of(
+            "password1", "12345678a", "qwerty123", "abc12345", "iloveyou1",
+            "password", "12345678", "qwerty", "abc123", "letmein",
+            "welcome", "admin", "password123", "123456789", "sunshine",
+            "princess", "football", "monkey", "dragon", "master",
+            "hello", "superman", "batman", "trustno1", "whatever"
     );
 
     /**
@@ -160,14 +171,14 @@ public final class FormValidator {
     /**
      * Validates the password field.
      * Rules: required, minimum 8 characters, at least one letter and one digit,
-     * no leading or trailing spaces.
+     * no leading or trailing spaces, not a common password.
      */
     public static ValidationResult validatePassword(String password) {
         if (password == null) {
             return ValidationResult.invalid(Error.PASSWORD_REQUIRED);
         }
         if (password.length() != password.trim().length()) {
-            return ValidationResult.invalid(Error.PASSWORD_REQUIRED);
+            return ValidationResult.invalid(Error.PASSWORD_HAS_EDGE_SPACES);
         }
         if (password.isEmpty()) {
             return ValidationResult.invalid(Error.PASSWORD_REQUIRED);
@@ -186,6 +197,10 @@ public final class FormValidator {
         }
         if (!hasDigit) {
             return ValidationResult.invalid(Error.PASSWORD_MISSING_DIGIT);
+        }
+        // Check against common passwords (case-insensitive)
+        if (COMMON_PASSWORDS.contains(password.toLowerCase())) {
+            return ValidationResult.invalid(Error.PASSWORD_TOO_COMMON);
         }
         return ValidationResult.valid();
     }

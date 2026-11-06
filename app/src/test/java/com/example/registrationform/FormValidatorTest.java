@@ -342,14 +342,14 @@ public class FormValidatorTest {
     @Test
     public void validateAll_valid() {
         long pastDate = 631152000000L; // 1990-01-01 UTC
-        FormValidator.ValidationResult result = FormValidator.validateAll("John Doe", pastDate, "john@example.com", "Password1", "Password1");
+        FormValidator.ValidationResult result = FormValidator.validateAll("John Doe", pastDate, "john@example.com", "MySecure1", "MySecure1");
         assertTrue(result.isValid());
     }
 
     @Test
     public void validateAll_nameFailsFirst() {
         long pastDate = 631152000000L;
-        FormValidator.ValidationResult result = FormValidator.validateAll("A", pastDate, "john@example.com", "Password1", "Password1");
+        FormValidator.ValidationResult result = FormValidator.validateAll("A", pastDate, "john@example.com", "MySecure1", "MySecure1");
         assertFalse(result.isValid());
         assertEquals(FormValidator.Error.NAME_TOO_SHORT, result.error);
     }
@@ -357,7 +357,7 @@ public class FormValidatorTest {
     @Test
     public void validateAll_dobFailsSecond() {
         long futureDate = java.time.Instant.now().toEpochMilli() + 86400000;
-        FormValidator.ValidationResult result = FormValidator.validateAll("John Doe", futureDate, "john@example.com", "Password1", "Password1");
+        FormValidator.ValidationResult result = FormValidator.validateAll("John Doe", futureDate, "john@example.com", "MySecure1", "MySecure1");
         assertFalse(result.isValid());
         assertEquals(FormValidator.Error.DOB_FUTURE, result.error);
     }
@@ -365,14 +365,14 @@ public class FormValidatorTest {
     @Test
     public void validateAll_emailFailsThird() {
         long pastDate = 631152000000L;
-        FormValidator.ValidationResult result = FormValidator.validateAll("John Doe", pastDate, "invalid-email", "Password1", "Password1");
+        FormValidator.ValidationResult result = FormValidator.validateAll("John Doe", pastDate, "invalid-email", "MySecure1", "MySecure1");
         assertFalse(result.isValid());
         assertEquals(FormValidator.Error.EMAIL_INVALID, result.error);
     }
 
     @Test
     public void validatePassword_valid() {
-        FormValidator.ValidationResult result = FormValidator.validatePassword("Password1");
+        FormValidator.ValidationResult result = FormValidator.validatePassword("MySecure1");
         assertTrue(result.isValid());
     }
 
@@ -400,14 +400,63 @@ public class FormValidatorTest {
     public void validatePassword_leadingSpace() {
         FormValidator.ValidationResult result = FormValidator.validatePassword(" Password1");
         assertFalse(result.isValid());
-        assertEquals(FormValidator.Error.PASSWORD_REQUIRED, result.error);
+        assertEquals(FormValidator.Error.PASSWORD_HAS_EDGE_SPACES, result.error);
     }
 
     @Test
     public void validatePassword_trailingSpace() {
         FormValidator.ValidationResult result = FormValidator.validatePassword("Password1 ");
         assertFalse(result.isValid());
-        assertEquals(FormValidator.Error.PASSWORD_REQUIRED, result.error);
+        assertEquals(FormValidator.Error.PASSWORD_HAS_EDGE_SPACES, result.error);
+    }
+
+    @Test
+    public void validatePassword_bothEdgeSpaces() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword(" Password1 ");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_HAS_EDGE_SPACES, result.error);
+    }
+
+    @Test
+    public void validatePassword_commonPassword() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword("password1");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, result.error);
+    }
+
+    @Test
+    public void validatePassword_commonPassword_caseInsensitive() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword("PASSWORD1");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, result.error);
+    }
+
+    @Test
+    public void validatePassword_commonPassword_mixedCase() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword("Password1");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, result.error);
+    }
+
+    @Test
+    public void validatePassword_commonPassword_qwerty123() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword("qwerty123");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, result.error);
+    }
+
+    @Test
+    public void validatePassword_commonPassword_abc12345() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword("abc12345");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, result.error);
+    }
+
+    @Test
+    public void validatePassword_commonPassword_iloveyou1() {
+        FormValidator.ValidationResult result = FormValidator.validatePassword("iloveyou1");
+        assertFalse(result.isValid());
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, result.error);
     }
 
     @Test
@@ -462,7 +511,7 @@ public class FormValidatorTest {
     public void validateAll_validWithPassword() {
         long pastDate = 631152000000L; // 1990-01-01 UTC
         FormValidator.ValidationResult result = FormValidator.validateAll(
-                "John Doe", pastDate, "john@example.com", "Password1", "Password1");
+                "John Doe", pastDate, "john@example.com", "MySecure1", "MySecure1");
         assertTrue(result.isValid());
     }
 
@@ -497,7 +546,7 @@ public class FormValidatorTest {
     public void validateAll_confirmMismatch() {
         long pastDate = 631152000000L;
         FormValidator.ValidationResult result = FormValidator.validateAll(
-                "John Doe", pastDate, "john@example.com", "Password1", "Password2");
+                "John Doe", pastDate, "john@example.com", "MySecure1", "MySecure2");
         assertFalse(result.isValid());
         assertEquals(FormValidator.Error.PASSWORD_MISMATCH, result.error);
     }
@@ -506,7 +555,7 @@ public class FormValidatorTest {
     public void validateAll_confirmRequired() {
         long pastDate = 631152000000L;
         FormValidator.ValidationResult result = FormValidator.validateAll(
-                "John Doe", pastDate, "john@example.com", "Password1", "");
+                "John Doe", pastDate, "john@example.com", "MySecure1", "");
         assertFalse(result.isValid());
         assertEquals(FormValidator.Error.CONFIRM_REQUIRED, result.error);
     }

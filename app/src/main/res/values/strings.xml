@@ -33,6 +33,8 @@
     <string name="error_password_too_short">Password must be at least 8 characters</string>
     <string name="error_password_missing_letter">Password must contain at least one letter</string>
     <string name="error_password_missing_digit">Password must contain at least one digit</string>
+    <string name="error_password_edge_spaces">Password cannot start or end with a space</string>
+    <string name="error_password_common">That password is too common</string>
     <string name="content_desc_password">Password input field</string>
     <string name="password_strength_weak">Weak</string>
     <string name="password_strength_fair">Fair</string>
