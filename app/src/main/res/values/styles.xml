@@ -14,6 +14,11 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
+    <style name="TextAppearance.App.Small" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
     <!-- TextInputLayout Style -->
     <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">@dimen/corner_radius</item>

@@ -115,9 +115,100 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:maxLines="1"
                 android:contentDescription="@string/content_desc_email" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Password Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/field_spacing"
+            android:hint="@string/hint_password"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilEmail"
+            style="@style/Widget.App.TextInputLayout"
+            app:startIconDrawable="@drawable/ic_lock"
+            app:startIconContentDescription="@string/content_desc_password"
+            app:endIconMode="password_toggle"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:imeOptions="actionNext"
+                android:maxLines="1"
+                android:autofillHints="newPassword"
+                android:contentDescription="@string/content_desc_password" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Password Strength Indicator -->
+        <LinearLayout
+            android:id="@+id/passwordStrengthContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/strength_margin_top"
+            android:layout_marginStart="@dimen/screen_padding"
+            android:layout_marginEnd="@dimen/screen_padding"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilPassword">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/passwordStrengthBar"
+                android:layout_width="0dp"
+                android:layout_height="4dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/strength_label_margin"
+                app:indicatorColor="@color/primary"
+                app:trackColor="@color/primaryContainer"
+                app:trackThickness="4dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/passwordStrengthLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.App.Small"
+                android:contentDescription="@string/password_strength_content_desc"
+                tools:text="Weak" />
+
+        </LinearLayout>
+
+        <!-- Confirm Password Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilConfirmPassword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/field_spacing"
+            android:hint="@string/hint_confirm_password"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/passwordStrengthContainer"
+            style="@style/Widget.App.TextInputLayout"
+            app:startIconDrawable="@drawable/ic_lock"
+            app:startIconContentDescription="@string/content_desc_confirm_password"
+            app:endIconMode="password_toggle"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:imeOptions="actionDone"
+                android:maxLines="1"
+                android:autofillHints="newPassword"
+                android:contentDescription="@string/content_desc_confirm_password" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -132,7 +223,7 @@
             style="@style/Widget.App.Button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilEmail"
+            app:layout_constraintTop_toBottomOf="@id/tilConfirmPassword"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

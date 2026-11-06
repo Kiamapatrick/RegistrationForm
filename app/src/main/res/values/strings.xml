@@ -27,6 +27,26 @@
     <string name="error_email_invalid">Please enter a valid email address</string>
     <string name="content_desc_email">Email input field</string>
 
+    <!-- Password Field -->
+    <string name="hint_password">Password</string>
+    <string name="error_password_required">Please enter a password</string>
+    <string name="error_password_too_short">Password must be at least 8 characters</string>
+    <string name="error_password_missing_letter">Password must contain at least one letter</string>
+    <string name="error_password_missing_digit">Password must contain at least one digit</string>
+    <string name="error_password_edge_spaces">Password cannot start or end with a space</string>
+    <string name="error_password_common">That password is too common</string>
+    <string name="content_desc_password">Password input field</string>
+    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_fair">Fair</string>
+    <string name="password_strength_strong">Strong</string>
+    <string name="password_strength_content_desc">Password strength indicator</string>
+
+    <!-- Confirm Password Field -->
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="error_confirm_required">Please confirm your password</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="content_desc_confirm_password">Confirm password input field</string>
+
     <!-- Next Button -->
     <string name="btn_next">Next</string>
     <string name="content_desc_next">Proceed to next step</string>

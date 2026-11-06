@@ -188,11 +188,17 @@ public class RegistrationViewModelTest {
         viewModel.setDobTouched(true);
         viewModel.setEmail("john@example.com");
         viewModel.setEmailTouched(true);
+        viewModel.setPassword("MySecure1");
+        viewModel.setPasswordTouched(true);
+        viewModel.setConfirmPassword("MySecure1");
+        viewModel.setConfirmPasswordTouched(true);
 
         assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
         assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
         assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
         assertEquals(FormValidator.Error.NONE, getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getPasswordError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getConfirmPasswordError()));
     }
 
     @Test
@@ -245,17 +251,25 @@ public class RegistrationViewModelTest {
         viewModel.setName("Jane Smith");
         viewModel.setDobUtcMillis(631152000000L); // 1990-01-01 UTC
         viewModel.setEmail("jane@example.com");
+        viewModel.setPassword("MySecure1");
+        viewModel.setConfirmPassword("MySecure1");
         viewModel.setNameTouched(true);
         viewModel.setDobTouched(true);
         viewModel.setEmailTouched(true);
+        viewModel.setPasswordTouched(true);
+        viewModel.setConfirmPasswordTouched(true);
 
         // Verify initial state
         assertEquals("Jane Smith", viewModel.getName());
         assertEquals(631152000000L, viewModel.getDobUtcMillis().longValue());
         assertEquals("jane@example.com", viewModel.getEmail());
+        assertEquals("MySecure1", viewModel.getPassword());
+        assertEquals("MySecure1", viewModel.getConfirmPassword());
         assertTrue(viewModel.isNameTouched());
         assertTrue(viewModel.isDobTouched());
         assertTrue(viewModel.isEmailTouched());
+        assertTrue(viewModel.isPasswordTouched());
+        assertTrue(viewModel.isConfirmPasswordTouched());
         assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
 
         // Create new ViewModel instance (simulating Activity recreation)
@@ -265,21 +279,31 @@ public class RegistrationViewModelTest {
         newViewModel.setName(viewModel.getName());
         newViewModel.setDobUtcMillis(viewModel.getDobUtcMillis());
         newViewModel.setEmail(viewModel.getEmail());
+        newViewModel.setPassword(viewModel.getPassword());
+        newViewModel.setConfirmPassword(viewModel.getConfirmPassword());
         newViewModel.setNameTouched(viewModel.isNameTouched());
         newViewModel.setDobTouched(viewModel.isDobTouched());
         newViewModel.setEmailTouched(viewModel.isEmailTouched());
+        newViewModel.setPasswordTouched(viewModel.isPasswordTouched());
+        newViewModel.setConfirmPasswordTouched(viewModel.isConfirmPasswordTouched());
 
         // Verify state is preserved
         assertEquals("Jane Smith", newViewModel.getName());
         assertEquals(631152000000L, newViewModel.getDobUtcMillis().longValue());
         assertEquals("jane@example.com", newViewModel.getEmail());
+        assertEquals("MySecure1", newViewModel.getPassword());
+        assertEquals("MySecure1", newViewModel.getConfirmPassword());
         assertTrue(newViewModel.isNameTouched());
         assertTrue(newViewModel.isDobTouched());
         assertTrue(newViewModel.isEmailTouched());
+        assertTrue(newViewModel.isPasswordTouched());
+        assertTrue(newViewModel.isConfirmPasswordTouched());
         assertTrue(Boolean.TRUE.equals(getValue(newViewModel.getIsFormValid())));
         assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getNameError()));
         assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getDobError()));
         assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getPasswordError()));
+        assertEquals(FormValidator.Error.NONE, getValue(newViewModel.getConfirmPasswordError()));
     }
 
     @Test
@@ -306,6 +330,188 @@ public class RegistrationViewModelTest {
 
         // But form should still be invalid
         assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_empty_showsErrorAfterTouched() {
+        viewModel.setPassword("");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_REQUIRED, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_tooShort_showsErrorAfterTouched() {
+        viewModel.setPassword("Pass1");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_TOO_SHORT, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_missingLetter_showsErrorAfterTouched() {
+        viewModel.setPassword("12345678");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_MISSING_LETTER, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_missingDigit_showsErrorAfterTouched() {
+        viewModel.setPassword("Password");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_MISSING_DIGIT, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_valid_clearsError() {
+        viewModel.setPassword("MySecure1");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getPasswordError()));
+    }
+
+    @Test
+    public void confirmPasswordValidation_empty_showsErrorAfterTouched() {
+        viewModel.setPassword("Password1");
+        viewModel.setConfirmPassword("");
+        viewModel.setConfirmPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.CONFIRM_REQUIRED, getValue(viewModel.getConfirmPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void confirmPasswordValidation_mismatch_showsErrorAfterTouched() {
+        viewModel.setPassword("Password1");
+        viewModel.setConfirmPassword("Password2");
+        viewModel.setConfirmPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_MISMATCH, getValue(viewModel.getConfirmPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void confirmPasswordValidation_valid_clearsError() {
+        viewModel.setPassword("Password1");
+        viewModel.setConfirmPassword("Password1");
+        viewModel.setConfirmPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getConfirmPasswordError()));
+    }
+
+    @Test
+    public void passwordValidation_edgeSpaces_showsErrorAfterTouched() {
+        viewModel.setPassword(" Password1");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_HAS_EDGE_SPACES, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void passwordValidation_commonPassword_showsErrorAfterTouched() {
+        viewModel.setPassword("password1");
+        viewModel.setPasswordTouched(true);
+
+        assertEquals(FormValidator.Error.PASSWORD_TOO_COMMON, getValue(viewModel.getPasswordError()));
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
+    @Test
+    public void formValid_allFieldsIncludingPassword_returnsTrue() {
+        viewModel.setName("John Doe");
+        viewModel.setNameTouched(true);
+        viewModel.setDobUtcMillis(631152000000L); // 1990-01-01 UTC
+        viewModel.setDobTouched(true);
+        viewModel.setEmail("john@example.com");
+        viewModel.setEmailTouched(true);
+        viewModel.setPassword("MySecure1");
+        viewModel.setPasswordTouched(true);
+        viewModel.setConfirmPassword("MySecure1");
+        viewModel.setConfirmPasswordTouched(true);
+
+        assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getPasswordError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getConfirmPasswordError()));
+    }
+
+    @Test
+    public void formValid_missingPassword_returnsFalse() {
+        viewModel.setName("John Doe");
+        viewModel.setNameTouched(true);
+        viewModel.setDobUtcMillis(631152000000L);
+        viewModel.setDobTouched(true);
+        viewModel.setEmail("john@example.com");
+        viewModel.setEmailTouched(true);
+        viewModel.setPassword("");
+        viewModel.setPasswordTouched(true);
+        viewModel.setConfirmPassword("MySecure1");
+        viewModel.setConfirmPasswordTouched(true);
+
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+        assertEquals(FormValidator.Error.PASSWORD_REQUIRED, getValue(viewModel.getPasswordError()));
+    }
+
+    @Test
+    public void formValid_confirmMismatch_returnsFalse() {
+        viewModel.setName("John Doe");
+        viewModel.setNameTouched(true);
+        viewModel.setDobUtcMillis(631152000000L);
+        viewModel.setDobTouched(true);
+        viewModel.setEmail("john@example.com");
+        viewModel.setEmailTouched(true);
+        viewModel.setPassword("MySecure1");
+        viewModel.setPasswordTouched(true);
+        viewModel.setConfirmPassword("MySecure2");
+        viewModel.setConfirmPasswordTouched(true);
+
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+        assertEquals(FormValidator.Error.PASSWORD_MISMATCH, getValue(viewModel.getConfirmPasswordError()));
+    }
+
+    @Test
+    public void passwordStrength_updatesOnPasswordChange() {
+        viewModel.setPassword("abc");
+        assertEquals(Integer.valueOf(25), getValue(viewModel.getPasswordStrengthProgress()));
+        assertEquals(PasswordStrength.Level.WEAK, getValue(viewModel.getPasswordStrengthLevel()));
+
+        viewModel.setPassword("Password1");
+        assertEquals(Integer.valueOf(60), getValue(viewModel.getPasswordStrengthProgress()));
+        assertEquals(PasswordStrength.Level.FAIR, getValue(viewModel.getPasswordStrengthLevel()));
+
+        viewModel.setPassword("Password123!");
+        assertEquals(Integer.valueOf(100), getValue(viewModel.getPasswordStrengthProgress()));
+        assertEquals(PasswordStrength.Level.STRONG, getValue(viewModel.getPasswordStrengthLevel()));
+    }
+
+    @Test
+    public void passwordStrength_clearedWhenPasswordEmpty() {
+        viewModel.setPassword("Password1");
+        assertEquals(Integer.valueOf(60), getValue(viewModel.getPasswordStrengthProgress()));
+
+        viewModel.setPassword("");
+        assertEquals(Integer.valueOf(0), getValue(viewModel.getPasswordStrengthProgress()));
+        assertEquals(PasswordStrength.Level.WEAK, getValue(viewModel.getPasswordStrengthLevel()));
+    }
+
+    @Test
+    public void confirmPasswordErrorOnlyAfterTouched() {
+        viewModel.setPassword("Password1");
+        viewModel.setConfirmPassword("Different");
+        // Don't touch confirm field yet
+
+        // Error should be NONE before touched
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getConfirmPasswordError()));
+
+        viewModel.setConfirmPasswordTouched(true);
+        // Now error should appear
+        assertEquals(FormValidator.Error.PASSWORD_MISMATCH, getValue(viewModel.getConfirmPasswordError()));
     }
 
     // Helper to get LiveData value synchronously (works with InstantTaskExecutorRule)

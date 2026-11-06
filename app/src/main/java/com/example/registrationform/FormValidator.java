@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +29,15 @@ public final class FormValidator {
         DOB_FUTURE,
         DOB_UNDER_AGE,
         EMAIL_REQUIRED,
-        EMAIL_INVALID
+        EMAIL_INVALID,
+        PASSWORD_REQUIRED,
+        PASSWORD_TOO_SHORT,
+        PASSWORD_MISSING_LETTER,
+        PASSWORD_MISSING_DIGIT,
+        PASSWORD_HAS_EDGE_SPACES,
+        PASSWORD_TOO_COMMON,
+        PASSWORD_MISMATCH,
+        CONFIRM_REQUIRED
     }
 
     /** Result of a validation check. */
@@ -55,6 +64,15 @@ public final class FormValidator {
     // Email regex pattern (RFC 5322 simplified)
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+    );
+
+    // Common passwords to reject (case-insensitive)
+    private static final Set<String> COMMON_PASSWORDS = Set.of(
+            "password1", "12345678a", "qwerty123", "abc12345", "iloveyou1",
+            "password", "12345678", "qwerty", "abc123", "letmein",
+            "welcome", "admin", "password123", "123456789", "sunshine",
+            "princess", "football", "monkey", "dragon", "master",
+            "hello", "superman", "batman", "trustno1", "whatever"
     );
 
     /**
@@ -151,10 +169,65 @@ public final class FormValidator {
     }
 
     /**
+     * Validates the password field.
+     * Rules: required, minimum 8 characters, at least one letter and one digit,
+     * no leading or trailing spaces, not a common password.
+     */
+    public static ValidationResult validatePassword(String password) {
+        if (password == null) {
+            return ValidationResult.invalid(Error.PASSWORD_REQUIRED);
+        }
+        if (password.length() != password.trim().length()) {
+            return ValidationResult.invalid(Error.PASSWORD_HAS_EDGE_SPACES);
+        }
+        if (password.isEmpty()) {
+            return ValidationResult.invalid(Error.PASSWORD_REQUIRED);
+        }
+        if (password.length() < 8) {
+            return ValidationResult.invalid(Error.PASSWORD_TOO_SHORT);
+        }
+        boolean hasLetter = false;
+        boolean hasDigit = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isLetter(c)) hasLetter = true;
+            if (Character.isDigit(c)) hasDigit = true;
+        }
+        if (!hasLetter) {
+            return ValidationResult.invalid(Error.PASSWORD_MISSING_LETTER);
+        }
+        if (!hasDigit) {
+            return ValidationResult.invalid(Error.PASSWORD_MISSING_DIGIT);
+        }
+        // Check against common passwords (case-insensitive)
+        if (COMMON_PASSWORDS.contains(password.toLowerCase())) {
+            return ValidationResult.invalid(Error.PASSWORD_TOO_COMMON);
+        }
+        return ValidationResult.valid();
+    }
+
+    /**
+     * Validates the confirm password field.
+     * Rules: required, must match password.
+     */
+    public static ValidationResult validateConfirmPassword(String confirmPassword, String password) {
+        if (confirmPassword == null) {
+            return ValidationResult.invalid(Error.CONFIRM_REQUIRED);
+        }
+        if (confirmPassword.isEmpty()) {
+            return ValidationResult.invalid(Error.CONFIRM_REQUIRED);
+        }
+        if (!confirmPassword.equals(password)) {
+            return ValidationResult.invalid(Error.PASSWORD_MISMATCH);
+        }
+        return ValidationResult.valid();
+    }
+
+    /**
      * Validates all fields at once. Returns the first error encountered,
      * or valid if all pass.
      */
-    public static ValidationResult validateAll(String name, Long dobUtcMillis, String email) {
+    public static ValidationResult validateAll(String name, Long dobUtcMillis, String email,
+                                               String password, String confirmPassword) {
         ValidationResult nameResult = validateName(name);
         if (!nameResult.isValid()) {
             return nameResult;
@@ -166,6 +239,14 @@ public final class FormValidator {
         ValidationResult emailResult = validateEmail(email);
         if (!emailResult.isValid()) {
             return emailResult;
+        }
+        ValidationResult passwordResult = validatePassword(password);
+        if (!passwordResult.isValid()) {
+            return passwordResult;
+        }
+        ValidationResult confirmResult = validateConfirmPassword(confirmPassword, password);
+        if (!confirmResult.isValid()) {
+            return confirmResult;
         }
         return ValidationResult.valid();
     }
