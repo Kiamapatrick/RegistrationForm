@@ -1,10 +1,10 @@
 package com.example.registrationform;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateDobField() {
         if (viewModel.getDobUtcMillis() != null) {
             // MaterialDatePicker returns UTC millis, so format with UTC timezone to avoid off-by-one-day bug
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             etDob.setText(sdf.format(viewModel.getDobUtcMillis()));
             tilDob.setError(null);
@@ -282,16 +282,17 @@ public class MainActivity extends AppCompatActivity {
             viewModel.setAllTouched();
 
             if (Boolean.TRUE.equals(viewModel.getIsFormValid().getValue())) {
-                // Form is valid - proceed to next step
+                // Form is valid - proceed to summary screen
                 String name = etName.getText().toString().trim();
-                String dob = etDob.getText().toString().trim();
                 String email = etEmail.getText().toString().trim();
+                Long dobUtcMillis = viewModel.getDobUtcMillis();
 
-                Toast.makeText(this,
-                        "Form submitted!\nName: " + name + "\nDOB: " + dob + "\nEmail: " + email,
-                        Toast.LENGTH_LONG).show();
+                RegistrationData data = new RegistrationData(name, email, dobUtcMillis);
+                Intent intent = new Intent(this, SummaryActivity.class);
+                intent.putExtra(RegistrationData.EXTRA_KEY, data);
+                startActivity(intent);
 
-                // TODO: Navigate to next screen or process registration
+                // Do not call finish() - keep MainActivity alive so ViewModel survives rotation
             }
         });
     }
