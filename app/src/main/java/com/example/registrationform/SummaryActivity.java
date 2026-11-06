@@ -7,7 +7,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -31,8 +33,11 @@ public class SummaryActivity extends AppCompatActivity {
 
     private MaterialButton btnEditDetails;
     private MaterialButton btnConfirm;
+    private MaterialButton btnDone;
 
     private RegistrationData registrationData;
+
+    private boolean isSuccessState = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +50,14 @@ public class SummaryActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Restore success state from saved instance state
+        if (savedInstanceState != null) {
+            isSuccessState = savedInstanceState.getBoolean("isSuccessState", false);
+        }
+
         // Extract registration data from Intent
         Intent intent = getIntent();
-        registrationData = intent.getParcelableExtra(RegistrationData.EXTRA_KEY);
+        registrationData = androidx.core.content.IntentCompat.getParcelableExtra(intent, RegistrationData.EXTRA_KEY, RegistrationData.class);
 
         // Handle missing data
         if (registrationData == null) {
@@ -58,6 +68,17 @@ public class SummaryActivity extends AppCompatActivity {
         initViews();
         populateSummary();
         setupButtons();
+
+        // Restore UI state
+        if (isSuccessState) {
+            showSuccessState();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isSuccessState", isSuccessState);
     }
 
     private void initViews() {
@@ -71,6 +92,7 @@ public class SummaryActivity extends AppCompatActivity {
 
         btnEditDetails = findViewById(R.id.btnEditDetails);
         btnConfirm = findViewById(R.id.btnConfirm);
+        btnDone = findViewById(R.id.btnDone);
     }
 
     private void populateSummary() {
@@ -90,9 +112,16 @@ public class SummaryActivity extends AppCompatActivity {
             // Show success state
             showSuccessState();
         });
+
+        btnDone.setOnClickListener(v -> {
+            // Set RESULT_OK and finish to trigger form reset in MainActivity
+            setResult(RESULT_OK);
+            finish();
+        });
     }
 
     private void showSuccessState() {
+        isSuccessState = true;
         summaryCard.setVisibility(View.GONE);
         successCard.setVisibility(View.VISIBLE);
         buttonRow.setVisibility(View.GONE);

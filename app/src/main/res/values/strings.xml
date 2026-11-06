@@ -66,6 +66,8 @@
     <string name="success_message">Registration Confirmed!</string>
     <string name="success_subtitle">Your details have been submitted successfully.</string>
     <string name="success_icon_desc">Success checkmark icon</string>
+    <string name="btn_done">Done</string>
+    <string name="content_desc_done">Finish and clear the form</string>
 
     <!-- Date Format -->
     <string name="date_format_display">dd MMM yyyy</string>

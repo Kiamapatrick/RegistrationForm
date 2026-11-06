@@ -7,7 +7,12 @@ import android.text.TextWatcher;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -47,6 +52,22 @@ public class MainActivity extends AppCompatActivity {
 
     // Guard against double date picker opening
     private boolean isDatePickerShowing = false;
+
+    // ActivityResultLauncher for SummaryActivity
+    private final ActivityResultLauncher<Intent> summaryActivityLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    new ActivityResultCallback<ActivityResult>() {
+                        @Override
+                        public void onActivityResult(ActivityResult result) {
+                            if (result.getResultCode() == RESULT_OK) {
+                                // User confirmed in SummaryActivity - reset form
+                                viewModel.reset();
+                                clearFormFields();
+                            }
+                            // Re-enable btnNext after activity returns
+                            btnNext.setEnabled(false); // Will be re-enabled by observeViewModel based on form validity
+                        }
+                    });
 
     private RegistrationViewModel viewModel;
 
@@ -290,9 +311,11 @@ public class MainActivity extends AppCompatActivity {
                 RegistrationData data = new RegistrationData(name, email, dobUtcMillis);
                 Intent intent = new Intent(this, SummaryActivity.class);
                 intent.putExtra(RegistrationData.EXTRA_KEY, data);
-                startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-                // Do not call finish() - keep MainActivity alive so ViewModel survives rotation
+                // Disable btnNext to prevent double-click while launch is in progress
+                btnNext.setEnabled(false);
+                summaryActivityLauncher.launch(intent);
             }
         });
     }
@@ -450,5 +473,25 @@ public class MainActivity extends AppCompatActivity {
             etConfirmPassword.setText(viewModel.getConfirmPassword());
             etConfirmPassword.setSelection(viewModel.getConfirmPassword().length());
         }
+    }
+
+    /**
+     * Clears all form fields in the UI after successful confirmation.
+     */
+    private void clearFormFields() {
+        etName.setText("");
+        etDob.setText("");
+        etEmail.setText("");
+        etPassword.setText("");
+        etConfirmPassword.setText("");
+
+        tilName.setError(null);
+        tilDob.setError(null);
+        tilEmail.setError(null);
+        tilPassword.setError(null);
+        tilConfirmPassword.setError(null);
+
+        passwordStrengthBar.setProgress(0, false);
+        passwordStrengthLabel.setVisibility(View.GONE);
     }
 }

@@ -26,15 +26,25 @@ public final class RegistrationData implements Parcelable {
     private RegistrationData(Parcel in) {
         name = in.readString();
         email = in.readString();
-        long dob = in.readLong();
-        dobUtcMillis = dob == -1 ? null : dob;
+        // Read byte flag (0 = null, 1 = has value) then the date if present
+        byte hasDob = in.readByte();
+        if (hasDob == 1) {
+            dobUtcMillis = in.readLong();
+        } else {
+            dobUtcMillis = null;
+        }
     }
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(email);
-        dest.writeLong(dobUtcMillis != null ? dobUtcMillis : -1);
+        if (dobUtcMillis != null) {
+            dest.writeByte((byte) 1);
+            dest.writeLong(dobUtcMillis);
+        } else {
+            dest.writeByte((byte) 0);
+        }
     }
 
     @Override
