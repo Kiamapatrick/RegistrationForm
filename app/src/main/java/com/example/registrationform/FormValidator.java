@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -196,8 +197,8 @@ public final class FormValidator {
         if (!hasDigit) {
             return ValidationResult.invalid(Error.PASSWORD_MISSING_DIGIT);
         }
-        // Check against common passwords (case-insensitive)
-        if (COMMON_PASSWORDS.contains(password.toLowerCase())) {
+        // Check against common passwords (case-insensitive, locale-insensitive)
+        if (COMMON_PASSWORDS.contains(password.toLowerCase(Locale.ROOT))) {
             return ValidationResult.invalid(Error.PASSWORD_TOO_COMMON);
         }
         return ValidationResult.valid();
