@@ -64,8 +64,10 @@ public class MainActivity extends AppCompatActivity {
                                 viewModel.reset();
                                 clearFormFields();
                             }
-                            // Re-enable btnNext after activity returns
-                            btnNext.setEnabled(false); // Will be re-enabled by observeViewModel based on form validity
+                            // Enable btnNext based on current form validity.
+                            // After RESULT_OK: form is reset (invalid) -> button stays disabled.
+                            // After RESULT_CANCELED (Edit details/back): form unchanged -> enabled if valid.
+                            btnNext.setEnabled(Boolean.TRUE.equals(viewModel.getIsFormValid().getValue()));
                         }
                     });
 

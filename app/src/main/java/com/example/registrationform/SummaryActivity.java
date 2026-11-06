@@ -38,6 +38,7 @@ public class SummaryActivity extends AppCompatActivity {
     private RegistrationData registrationData;
 
     private boolean isSuccessState = false;
+    private static final String KEY_SUCCESS_STATE = "isSuccessState";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +53,12 @@ public class SummaryActivity extends AppCompatActivity {
 
         // Restore success state from saved instance state
         if (savedInstanceState != null) {
-            isSuccessState = savedInstanceState.getBoolean("isSuccessState", false);
+            isSuccessState = savedInstanceState.getBoolean(KEY_SUCCESS_STATE, false);
         }
 
         // Extract registration data from Intent
         Intent intent = getIntent();
-        registrationData = androidx.core.content.IntentCompat.getParcelableExtra(intent, RegistrationData.EXTRA_KEY, RegistrationData.class);
+        registrationData = IntentCompat.getParcelableExtra(intent, RegistrationData.EXTRA_KEY, RegistrationData.class);
 
         // Handle missing data
         if (registrationData == null) {
@@ -78,7 +79,7 @@ public class SummaryActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("isSuccessState", isSuccessState);
+        outState.putBoolean(KEY_SUCCESS_STATE, isSuccessState);
     }
 
     private void initViews() {
@@ -122,6 +123,7 @@ public class SummaryActivity extends AppCompatActivity {
 
     private void showSuccessState() {
         isSuccessState = true;
+        setResult(RESULT_OK);
         summaryCard.setVisibility(View.GONE);
         successCard.setVisibility(View.VISIBLE);
         buttonRow.setVisibility(View.GONE);
