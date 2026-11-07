@@ -30,10 +30,10 @@ A modern Android registration form built with **Java** and **Material Design 3**
 |-----------|------------|
 | Language | Java (Android) |
 | Min SDK | 24 (Android 7.0 Nougat) |
-| Compile / Target SDK | 36 (Android 14) |
+| Compile / Target SDK | 36 (Android 16) |
 | Build System | Gradle (Kotlin DSL) with version catalog (`gradle/libs.versions.toml`) |
 | UI Framework | Material Design 3 / Jetpack (AppCompat, ConstraintLayout) |
-| Date Picker | `com.google.android.material:material-datepicker` (via `espresso-contrib`) |
+| Date Picker | `MaterialDatePicker` from `com.google.android.material:material` |
 | Architecture | Single Activity (`MainActivity`) + `SummaryActivity`; `RegistrationViewModel` with LiveData; pure-Java validation/formatter units |
 
 ## Project Structure
@@ -83,8 +83,8 @@ RegistrationForm/
 
 ### Prerequisites
 
-- Android Studio Ladybug (2024.2.1) or later
-- JDK 17 or later
+- Android Studio Narwhal (2025.1) or newer
+- JDK 17
 - Android SDK 36
 
 ### Installation
@@ -119,7 +119,7 @@ Uses `MaterialDatePicker` with `DateValidatorPointBackward` capped at 18 years a
 
 ### Validation Strategy
 - Pure Java `FormValidator` (no Android dependencies) — unit-testable on JVM.
-- Errors appear **after** user interacts (focus loss or typing).
+- Errors appear after a field loses focus (or after the user presses Next).
 - Real-time validation while typing (after first interaction).
 - All fields validated on "Next" button click.
 - Button enabled only when all fields pass validation.
@@ -231,7 +231,7 @@ GitHub Actions workflow (`.github/workflows/android.yml`) runs on every push and
 - [x] Multi-step registration flow (SummaryActivity with edit/confirm)
 - [x] ViewModel + LiveData for state management
 - [x] Password field with strength indicator
-- [x] Phone number field with country code picker (not implemented; DOB picker only)
+- [ ] Phone number field with country code picker
 - [x] Unit tests for validation logic (FormValidator, PasswordStrength, RegistrationFormatter, RegistrationViewModel)
 - [x] UI tests with Espresso (14 tests)
 - [x] Dark mode optimizations (full values-night palette, WCAG AA)

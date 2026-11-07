@@ -2,9 +2,15 @@ name: Android CI
 
 on:
   push:
-    branches: ["*"]
+    branches: [master]
   pull_request:
-    branches: ["*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -23,9 +29,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
@@ -37,21 +40,27 @@ jobs:
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
 
       - name: Upload Unit Test Results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: unit-test-results
           path: app/build/test-results/**/*.xml
+          if-no-files-found: warn
 
       - name: Upload Lint Report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: lint-report
           path: app/build/reports/lint-results-debug.html
+          if-no-files-found: warn
 
       # Instrumented tests require an emulator. They are run locally with:
       # ./gradlew connectedDebugAndroidTest
