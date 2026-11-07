@@ -5,6 +5,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -16,6 +17,7 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithK
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
+import static androidx.test.espresso.matcher.ViewMatchers.isFocused;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
@@ -26,6 +28,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -353,6 +356,68 @@ public class RegistrationFormTest {
         onView(withId(R.id.etConfirmPassword)).check(matches(ViewMatchers.withText("")));
         onView(withId(R.id.etDob)).check(matches(ViewMatchers.withText("")));
         onView(withId(R.id.btnNext)).check(matches(not(isEnabled())));
+    }
+
+    /**
+     * Test 11: Keyboard Next action moves focus through fields in order.
+     * Name → Email → Password → Confirm Password (Done submits when valid).
+     * Date of Birth is skipped in keyboard flow (picked from picker) but remains reachable.
+     * Behavioural test using pressImeActionButton().
+     */
+    @Test
+    public void keyboardNextActionMovesFocusInOrder() {
+        // Start with name field focused
+        onView(withId(R.id.etName)).perform(scrollTo(), click());
+
+        // Press IME Next on name -> email should have focus
+        onView(withId(R.id.etName)).perform(pressImeActionButton());
+        onView(withId(R.id.etEmail)).check(matches(isFocused()));
+
+        // Press IME Next on email -> password should have focus
+        onView(withId(R.id.etEmail)).perform(pressImeActionButton());
+        onView(withId(R.id.etPassword)).check(matches(isFocused()));
+
+        // Press IME Next on password -> confirm password should have focus
+        onView(withId(R.id.etPassword)).perform(pressImeActionButton());
+        onView(withId(R.id.etConfirmPassword)).check(matches(isFocused()));
+
+        // Now fill a fully valid form and press Done on confirm password -> SummaryActivity opens
+        onView(withId(R.id.etName)).perform(scrollTo(), replaceText("John Doe"));
+        onView(withId(R.id.etEmail)).perform(scrollTo(), replaceText("john@example.com"));
+        onView(withId(R.id.etPassword)).perform(scrollTo(), replaceText("MySecure1"));
+        onView(withId(R.id.etConfirmPassword)).perform(scrollTo(), replaceText("MySecure1"));
+        setDobViaViewModel(LocalDate.of(1990, 1, 15));
+
+        // Press IME Done on confirm password (actionDone)
+        onView(withId(R.id.etConfirmPassword)).perform(pressImeActionButton());
+
+        // Verify SummaryActivity opened by checking tvNameValue is displayed
+        onView(withId(R.id.tvNameValue)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test 12: Done on confirm password does NOT open SummaryActivity when form is invalid.
+     * Leaves the email empty so form is invalid.
+     */
+    @Test
+    public void keyboardDoneDoesNotSubmitWhenInvalid() {
+        // Start with name field focused
+        onView(withId(R.id.etName)).perform(scrollTo(), click());
+
+        // Fill name and password but leave email empty
+        onView(withId(R.id.etName)).perform(replaceText("John Doe"));
+        onView(withId(R.id.etPassword)).perform(replaceText("MySecure1"));
+        onView(withId(R.id.etConfirmPassword)).perform(replaceText("MySecure1"));
+        setDobViaViewModel(LocalDate.of(1990, 1, 15));
+
+        // Focus confirm password and press IME Done
+        onView(withId(R.id.etConfirmPassword)).perform(scrollTo(), click());
+        onView(withId(R.id.etConfirmPassword)).perform(pressImeActionButton());
+
+        // Should still be in MainActivity - btnNext should be present (not SummaryActivity)
+        onView(withId(R.id.btnNext)).check(matches(isDisplayed()));
+        // SummaryActivity's tvNameValue must not exist
+        onView(withId(R.id.tvNameValue)).check(doesNotExist());
     }
 
     /**

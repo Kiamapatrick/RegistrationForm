@@ -162,7 +162,8 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilPassword">
+            app:layout_constraintTop_toBottomOf="@id/tilPassword"
+            android:importantForAccessibility="yes">
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/passwordStrengthBar"
@@ -172,7 +173,9 @@
                 android:layout_marginEnd="@dimen/strength_label_margin"
                 app:indicatorColor="@color/primary"
                 app:trackColor="@color/primaryContainer"
-                app:trackThickness="4dp" />
+                app:trackThickness="4dp"
+                android:contentDescription="@string/password_strength_content_desc"
+                android:importantForAccessibility="yes" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/passwordStrengthLabel"
@@ -180,6 +183,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.App.Small"
                 android:contentDescription="@string/password_strength_content_desc"
+                android:accessibilityLiveRegion="polite"
                 tools:text="Weak" />
 
         </LinearLayout>

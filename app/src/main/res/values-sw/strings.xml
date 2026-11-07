@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- All translations are a first draft awaiting review by a native speaker -->
+<resources>
+    <string name="app_name">Fomu ya Usajili</string>
+
+    <!-- Registration Screen -->
+    <string name="registration_title">Usajili</string>
+    <string name="registration_subtitle">Unda akaunti yako kuanzia hapa</string>
+
+    <!-- Name Field -->
+    <string name="hint_full_name">Jina Kamili</string>
+    <string name="error_name_required">Tafadhali ingiza jina lako</string>
+    <string name="error_name_min_length">Jina linahitaji kuwa na herufi angalau 2</string>
+    <string name="error_name_invalid">Jina linaweza kuwa na herufi, nafasi, kistariungio na apostrofi tu</string>
+    <string name="content_desc_name">Kiwanja cha kuingiza jina kamili</string>
+
+    <!-- Date of Birth Field -->
+    <string name="hint_date_of_birth">Tarehe ya Kuzaliwa</string>
+    <string name="error_dob_required">Tafadhali chagua tarehe yako ya kuzaliwa</string>
+    <string name="error_dob_future">Tarehe ya kuzaliwa haikuwi kuwa kwa baadaye</string>
+    <string name="error_dob_under_age">Lazima uwe na umri wa miaka 18 au zaidi ili ujisajili</string>
+    <string name="content_desc_dob">Kiwanja cha kuingiza tarehe ya kuzaliwa</string>
+    <string name="content_desc_calendar">Chagua tarehe ya kuzaliwa</string>
+
+    <!-- Email Field -->
+    <string name="hint_email">Barua Pepe</string>
+    <string name="error_email_required">Tafadhali ingiza barua pepe yako</string>
+    <string name="error_email_invalid">Tafadhali ingiza anwani sahihi ya barua pepe</string>
+    <string name="content_desc_email">Kiwanja cha kuingiza barua pepe</string>
+
+    <!-- Password Field -->
+    <string name="hint_password">Nenosiri</string>
+    <string name="error_password_required">Tafadhali ingiza nenosiri</string>
+    <string name="error_password_too_short">Nenosiri linahitaji kuwa na angalau herufi 8</string>
+    <string name="error_password_missing_letter">Nenosiri linahitaji kuwa na angalau herufi moja</string>
+    <string name="error_password_missing_digit">Nenosiri linahitaji kuwa na angalau nambari moja</string>
+    <string name="error_password_edge_spaces">Nenosiri haliruhusiwi kuanzia au kumaliziana na nafasi</string>
+    <string name="error_password_common">Hilo nenosiri ni la kawaida sana</string>
+    <string name="content_desc_password">Kiwanja cha kuingiza nenosiri</string>
+    <string name="password_strength_weak">Dhaifu</string>
+    <string name="password_strength_fair">Wastani</string>
+    <string name="password_strength_strong">Imara</string>
+    <string name="password_strength_content_desc">Kielelezo cha nguvu ya nenosiri</string>
+
+    <!-- Confirm Password Field -->
+    <string name="hint_confirm_password">Thibitisha Nenosiri</string>
+    <string name="error_confirm_required">Tafadhali thibitisha nenosiri lako</string>
+    <string name="error_password_mismatch">Nenosiri halifanani</string>
+    <string name="content_desc_confirm_password">Kiwanja cha kuthibitisha nenosiri</string>
+
+    <!-- Next Button -->
+    <string name="btn_next">Endelea</string>
+    <string name="content_desc_next">Nenda hatua ijayo</string>
+
+    <!-- Summary Screen -->
+    <string name="summary_title">Angalia Maelezo Yako</string>
+    <string name="summary_subtitle">Tafadhali thibitisha taarifa hapa chini kabla ya kuthibitisha</string>
+    <string name="summary_name_label">Jina Kamili</string>
+    <string name="summary_dob_label">Tarehe ya Kuzaliwa</string>
+    <string name="summary_email_label">Barua Pepe</string>
+    <string name="btn_edit_details">Hariri Maelezo</string>
+    <string name="btn_confirm">Thibitisha</string>
+    <string name="content_desc_edit_details">Rudi kuhariri maelezo yako</string>
+    <string name="content_desc_confirm">Thibitisha usajili na wasilisha</string>
+
+    <!-- Success State -->
+    <string name="success_message">Usajili Umefanikiwa!</string>
+    <string name="success_subtitle">Maelezo yako yamewasilishwa kwa mafanikio.</string>
+    <string name="success_icon_desc">Aikoni ya alama ya mafanikio</string>
+    <string name="btn_done">Kamilisha</string>
+    <string name="content_desc_done">Kamilisha na futa fomu</string>
+
+    <!-- Date Format - Swahili locale will use MMM format with Swahili month names -->
+    <string name="date_format_display">dd MMM yyyy</string>
+</resources>

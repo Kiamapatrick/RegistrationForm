@@ -13,15 +13,16 @@ public final class RegistrationFormatter {
     private RegistrationFormatter() {}
 
     /**
-     * Formats a date of birth (UTC millis) as "dd MMM yyyy" in UTC.
+     * Formats a date of birth (UTC millis) as "dd MMM yyyy" in UTC using the given locale.
      * @param dobUtcMillis Date of birth in UTC milliseconds, or null.
+     * @param locale The locale to use for month names.
      * @return Formatted date string, or empty string if null.
      */
-    public static String formatDob(Long dobUtcMillis) {
+    public static String formatDob(Long dobUtcMillis, Locale locale) {
         if (dobUtcMillis == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", locale);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(dobUtcMillis);
     }

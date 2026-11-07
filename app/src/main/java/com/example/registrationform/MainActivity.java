@@ -207,7 +207,9 @@ public class MainActivity extends AppCompatActivity {
     private void updateDobField() {
         if (viewModel.getDobUtcMillis() != null) {
             // MaterialDatePicker returns UTC millis, so format with UTC timezone to avoid off-by-one-day bug
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+            // Use device locale for month names (e.g., Swahili month names when device is in Swahili)
+            Locale locale = getResources().getConfiguration().getLocales().get(0);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", locale);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             etDob.setText(sdf.format(viewModel.getDobUtcMillis()));
             tilDob.setError(null);
@@ -293,6 +295,19 @@ public class MainActivity extends AppCompatActivity {
             if (!hasFocus) {
                 viewModel.setConfirmPasswordTouched(true);
             }
+        });
+
+        // Handle "Done" action on confirm password field to submit form when valid
+        etConfirmPassword.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                // Validate all fields on submit
+                viewModel.setAllTouched();
+                if (Boolean.TRUE.equals(viewModel.getIsFormValid().getValue())) {
+                    btnNext.performClick();
+                    return true;
+                }
+            }
+            return false;
         });
 
         // DOB field doesn't need a text watcher since it's not editable
