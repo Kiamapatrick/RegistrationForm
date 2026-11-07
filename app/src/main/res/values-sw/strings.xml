@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- All translations are a first draft awaiting review by a native speaker -->
 <resources>
     <string name="app_name">Fomu ya Usajili</string>
 
@@ -10,14 +11,14 @@
     <string name="hint_full_name">Jina Kamili</string>
     <string name="error_name_required">Tafadhali ingiza jina lako</string>
     <string name="error_name_min_length">Jina linahitaji kuwa na herufi angalau 2</string>
-    <string name="error_name_invalid">Jina linaweza kuwa na herufi, nafasi, vifunguo na chapa (\') tu</string>
+    <string name="error_name_invalid">Jina linaweza kuwa na herufi, nafasi, kistariungio na apostrofi tu</string>
     <string name="content_desc_name">Kiwanja cha kuingiza jina kamili</string>
 
     <!-- Date of Birth Field -->
     <string name="hint_date_of_birth">Tarehe ya Kuzaliwa</string>
     <string name="error_dob_required">Tafadhali chagua tarehe yako ya kuzaliwa</string>
     <string name="error_dob_future">Tarehe ya kuzaliwa haikuwi kuwa kwa baadaye</string>
-    <string name="error_dob_under_age">Unahitaji kuwa na miaka 18 au zaidi kusaidiri</string>
+    <string name="error_dob_under_age">Lazima uwe na umri wa miaka 18 au zaidi ili ujisajili</string>
     <string name="content_desc_dob">Kiwanja cha kuingiza tarehe ya kuzaliwa</string>
     <string name="content_desc_calendar">Chagua tarehe ya kuzaliwa</string>
 

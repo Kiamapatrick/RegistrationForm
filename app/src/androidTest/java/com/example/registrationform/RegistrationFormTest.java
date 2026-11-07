@@ -362,44 +362,60 @@ public class RegistrationFormTest {
      * Test 11: Keyboard Next action moves focus through fields in order.
      * Name → Email → Password → Confirm Password (Done submits when valid).
      * Date of Birth is skipped in keyboard flow (picked from picker) but remains reachable.
-     * Verifies imeOptions are set correctly.
+     * Behavioural test using pressImeActionButton().
      */
     @Test
     public void keyboardNextActionMovesFocusInOrder() {
-        // Verify imeOptions are set correctly on each field
-        activityRule.getScenario().onActivity(activity -> {
-            android.widget.TextView etName = activity.findViewById(R.id.etName);
-            android.widget.TextView etEmail = activity.findViewById(R.id.etEmail);
-            android.widget.TextView etPassword = activity.findViewById(R.id.etPassword);
-            android.widget.TextView etConfirmPassword = activity.findViewById(R.id.etConfirmPassword);
-            android.widget.TextView etDob = activity.findViewById(R.id.etDob);
+        // Start with name field focused
+        onView(withId(R.id.etName)).perform(scrollTo(), click());
 
-            // Name: actionNext
-            assertEquals("Name field should have actionNext",
-                    android.view.inputmethod.EditorInfo.IME_ACTION_NEXT, etName.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+        // Press IME Next on name -> email should have focus
+        onView(withId(R.id.etName)).perform(pressImeActionButton());
+        onView(withId(R.id.etEmail)).check(matches(isFocused()));
 
-            // Email: actionNext
-            assertEquals("Email field should have actionNext",
-                    android.view.inputmethod.EditorInfo.IME_ACTION_NEXT, etEmail.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+        // Press IME Next on email -> password should have focus
+        onView(withId(R.id.etEmail)).perform(pressImeActionButton());
+        onView(withId(R.id.etPassword)).check(matches(isFocused()));
 
-            // Password: actionNext
-            assertEquals("Password field should have actionNext",
-                    android.view.inputmethod.EditorInfo.IME_ACTION_NEXT, etPassword.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+        // Press IME Next on password -> confirm password should have focus
+        onView(withId(R.id.etPassword)).perform(pressImeActionButton());
+        onView(withId(R.id.etConfirmPassword)).check(matches(isFocused()));
 
-            // Confirm Password: actionDone
-            assertEquals("Confirm Password field should have actionDone",
-                    android.view.inputmethod.EditorInfo.IME_ACTION_DONE, etConfirmPassword.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+        // Now fill a fully valid form and press Done on confirm password -> SummaryActivity opens
+        onView(withId(R.id.etName)).perform(scrollTo(), replaceText("John Doe"));
+        onView(withId(R.id.etEmail)).perform(scrollTo(), replaceText("john@example.com"));
+        onView(withId(R.id.etPassword)).perform(scrollTo(), replaceText("MySecure1"));
+        onView(withId(R.id.etConfirmPassword)).perform(scrollTo(), replaceText("MySecure1"));
+        setDobViaViewModel(LocalDate.of(1990, 1, 15));
 
-            // DOB: not editable, focusable=false, so skipped in keyboard flow
-            assertFalse("DOB field should not be focusable in keyboard flow", etDob.isFocusable());
-        });
+        // Press IME Done on confirm password (actionDone)
+        onView(withId(R.id.etConfirmPassword)).perform(pressImeActionButton());
 
-        // Verify all fields are reachable (clickable)
-        onView(withId(R.id.etName)).check(matches(isDisplayed()));
-        onView(withId(R.id.etEmail)).check(matches(isDisplayed()));
-        onView(withId(R.id.etPassword)).check(matches(isDisplayed()));
-        onView(withId(R.id.etConfirmPassword)).check(matches(isDisplayed()));
-        onView(withId(R.id.etDob)).check(matches(isDisplayed()));
+        // Verify SummaryActivity opened by checking tvNameValue is displayed
+        onView(withId(R.id.tvNameValue)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test 12: Done on confirm password does NOT open SummaryActivity when form is invalid.
+     * Leaves the email empty so form is invalid.
+     */
+    @Test
+    public void keyboardDoneDoesNotSubmitWhenInvalid() {
+        // Start with name field focused
+        onView(withId(R.id.etName)).perform(scrollTo(), click());
+
+        // Fill name and password but leave email empty
+        onView(withId(R.id.etName)).perform(replaceText("John Doe"));
+        onView(withId(R.id.etPassword)).perform(replaceText("MySecure1"));
+        onView(withId(R.id.etConfirmPassword)).perform(replaceText("MySecure1"));
+        setDobViaViewModel(LocalDate.of(1990, 1, 15));
+
+        // Focus confirm password and press IME Done
+        onView(withId(R.id.etConfirmPassword)).perform(scrollTo(), click());
+        onView(withId(R.id.etConfirmPassword)).perform(pressImeActionButton());
+
+        // Should still be in MainActivity - btnNext should be present (not SummaryActivity)
+        onView(withId(R.id.btnNext)).check(matches(isDisplayed()));
     }
 
     /**
