@@ -416,6 +416,8 @@ public class RegistrationFormTest {
 
         // Should still be in MainActivity - btnNext should be present (not SummaryActivity)
         onView(withId(R.id.btnNext)).check(matches(isDisplayed()));
+        // SummaryActivity's tvNameValue must not exist
+        onView(withId(R.id.tvNameValue)).check(doesNotExist());
     }
 
     /**
