@@ -17,6 +17,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.Locale;
+
 /**
  * Summary screen showing the registration details for confirmation.
  * Does not store or log any password data.
@@ -98,7 +100,9 @@ public class SummaryActivity extends AppCompatActivity {
 
     private void populateSummary() {
         tvNameValue.setText(registrationData.name);
-        tvDobValue.setText(RegistrationFormatter.formatDob(registrationData.dobUtcMillis));
+        // Use device locale for month names (e.g., Swahili month names when device is in Swahili)
+        Locale locale = getResources().getConfiguration().getLocales().get(0);
+        tvDobValue.setText(RegistrationFormatter.formatDob(registrationData.dobUtcMillis, locale));
         tvEmailValue.setText(registrationData.email);
     }
 

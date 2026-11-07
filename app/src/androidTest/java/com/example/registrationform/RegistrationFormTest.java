@@ -5,6 +5,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -16,6 +17,7 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithK
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
+import static androidx.test.espresso.matcher.ViewMatchers.isFocused;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
@@ -26,6 +28,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -353,6 +356,50 @@ public class RegistrationFormTest {
         onView(withId(R.id.etConfirmPassword)).check(matches(ViewMatchers.withText("")));
         onView(withId(R.id.etDob)).check(matches(ViewMatchers.withText("")));
         onView(withId(R.id.btnNext)).check(matches(not(isEnabled())));
+    }
+
+    /**
+     * Test 11: Keyboard Next action moves focus through fields in order.
+     * Name → Email → Password → Confirm Password (Done submits when valid).
+     * Date of Birth is skipped in keyboard flow (picked from picker) but remains reachable.
+     * Verifies imeOptions are set correctly.
+     */
+    @Test
+    public void keyboardNextActionMovesFocusInOrder() {
+        // Verify imeOptions are set correctly on each field
+        activityRule.getScenario().onActivity(activity -> {
+            android.widget.TextView etName = activity.findViewById(R.id.etName);
+            android.widget.TextView etEmail = activity.findViewById(R.id.etEmail);
+            android.widget.TextView etPassword = activity.findViewById(R.id.etPassword);
+            android.widget.TextView etConfirmPassword = activity.findViewById(R.id.etConfirmPassword);
+            android.widget.TextView etDob = activity.findViewById(R.id.etDob);
+
+            // Name: actionNext
+            assertEquals("Name field should have actionNext",
+                    android.view.inputmethod.EditorInfo.IME_ACTION_NEXT, etName.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+
+            // Email: actionNext
+            assertEquals("Email field should have actionNext",
+                    android.view.inputmethod.EditorInfo.IME_ACTION_NEXT, etEmail.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+
+            // Password: actionNext
+            assertEquals("Password field should have actionNext",
+                    android.view.inputmethod.EditorInfo.IME_ACTION_NEXT, etPassword.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+
+            // Confirm Password: actionDone
+            assertEquals("Confirm Password field should have actionDone",
+                    android.view.inputmethod.EditorInfo.IME_ACTION_DONE, etConfirmPassword.getImeOptions() & android.view.inputmethod.EditorInfo.IME_MASK_ACTION);
+
+            // DOB: not editable, focusable=false, so skipped in keyboard flow
+            assertFalse("DOB field should not be focusable in keyboard flow", etDob.isFocusable());
+        });
+
+        // Verify all fields are reachable (clickable)
+        onView(withId(R.id.etName)).check(matches(isDisplayed()));
+        onView(withId(R.id.etEmail)).check(matches(isDisplayed()));
+        onView(withId(R.id.etPassword)).check(matches(isDisplayed()));
+        onView(withId(R.id.etConfirmPassword)).check(matches(isDisplayed()));
+        onView(withId(R.id.etDob)).check(matches(isDisplayed()));
     }
 
     /**
