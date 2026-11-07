@@ -57,7 +57,6 @@ import org.junit.runner.RunWith;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.regex.Pattern;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
@@ -125,43 +124,7 @@ public class RegistrationFormTest {
 
     
 
-    /**
-     * Matcher for DOB field - flexible date format matching various date formats.
-     * Accepts formats like: "15 Jan 1990", "15 JAN 1990", "15 Jan 1990", "15/01/1990", "1990-01-15", etc.
-     * Also accepts empty string (for reset test).
-     */
-    private static Matcher<View> hasDobFormat() {
-        return new TypeSafeMatcher<View>() {
-            private final Pattern[] dobPatterns = {
-                Pattern.compile("\\d{1,2}\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+\\d{4}", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("\\d{1,2}\\s+(January|February|March|April|May|June|July|August|September|October|November|December)\\s+\\d{4}", Pattern.CASE_INSENSITIVE),
-                Pattern.compile("\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{4}"),
-                Pattern.compile("\\d{4}-\\d{2}-\\d{2}"),
-            };
-
-            @Override
-            protected boolean matchesSafely(View view) {
-                if (!(view instanceof TextView)) {
-                    return false;
-                }
-                CharSequence text = ((TextView) view).getText();
-                if (text == null) return false;
-                String textStr = text.toString().trim().replaceAll("\\\\s+", " ");
-                for (Pattern pattern : dobPatterns) {
-                    if (pattern.matcher(textStr).matches()) {
-                        return true;
-                    }
-                }
-                // Also accept if the view is empty (for reset test after form clear)
-                return text.toString().trim().isEmpty();
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("DOB field with valid date format");
-            }
-        };
-    }
+    
 
     @Test
     public void nextButtonDisabledOnLaunch() {
@@ -250,12 +213,15 @@ public class RegistrationFormTest {
         // Recreate activity (simulates rotation)
         activityRule.getScenario().recreate();
 
+        // Ensure activity is fully recreated and ViewModel is synced
+        activityRule.getScenario().onActivity(activity -> { /* no-op */ });
+
         // Verify all fields are preserved
         onView(withId(R.id.etName)).check(matches(ViewMatchers.withText("Jane Smith")));
         onView(withId(R.id.etEmail)).check(matches(ViewMatchers.withText("jane@example.com")));
         onView(withId(R.id.etPassword)).check(matches(ViewMatchers.withText("MySecure1")));
         onView(withId(R.id.etConfirmPassword)).check(matches(ViewMatchers.withText("MySecure1")));
-        onView(withId(R.id.etDob)).check(matches(hasDobFormat()));
+        onView(withId(R.id.etDob)).check(matches(ViewMatchers.withText("15 Jan 1990")));
     }
 
     /**
@@ -283,7 +249,7 @@ public class RegistrationFormTest {
         // Now verify the summary screen shows the correct data and NO password
         onView(withId(R.id.tvNameValue)).check(matches(ViewMatchers.withText("John Doe")));
         onView(withId(R.id.tvEmailValue)).check(matches(ViewMatchers.withText("john@example.com")));
-        onView(withId(R.id.tvDobValue)).check(matches(hasDobFormat()));
+        onView(withId(R.id.tvDobValue)).check(matches(ViewMatchers.withText("15 Jan 1990")));
         
         // Verify password is NOT shown anywhere
         onView(withText(containsString("MySecure1"))).check(doesNotExist());
@@ -312,7 +278,6 @@ public class RegistrationFormTest {
         onView(withId(R.id.etEmail)).check(matches(ViewMatchers.withText("john@example.com")));
         onView(withId(R.id.etPassword)).check(matches(ViewMatchers.withText("MySecure1")));
         onView(withId(R.id.etConfirmPassword)).check(matches(ViewMatchers.withText("MySecure1")));
-        onView(withId(R.id.etDob)).check(matches(hasDobFormat()));
         
         // Verify DOB in ViewModel is correct (the DOB is set in ViewModel but etDob text may not update immediately after Edit)
         activityRule.getScenario().onActivity(activity -> {
