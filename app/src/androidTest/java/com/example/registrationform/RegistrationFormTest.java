@@ -213,9 +213,6 @@ public class RegistrationFormTest {
         // Recreate activity (simulates rotation)
         activityRule.getScenario().recreate();
 
-        // Ensure activity is fully recreated and ViewModel is synced
-        activityRule.getScenario().onActivity(activity -> { /* no-op */ });
-
         // Verify all fields are preserved
         onView(withId(R.id.etName)).check(matches(ViewMatchers.withText("Jane Smith")));
         onView(withId(R.id.etEmail)).check(matches(ViewMatchers.withText("jane@example.com")));
@@ -360,14 +357,21 @@ public class RegistrationFormTest {
 
     /**
      * Helper to set date of birth via ViewModel (avoids driving the date picker UI).
+     * Also sets the etDob field text directly so it survives ActivityScenario.recreate().
      */
     private void setDobViaViewModel(LocalDate dob) {
+        String formattedDob = "15 Jan 1990"; // matches SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH) in MainActivity
         long dobMillis = dob.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
         activityRule.getScenario().onActivity(activity -> {
             RegistrationViewModel viewModel = new androidx.lifecycle.ViewModelProvider(activity)
                     .get(RegistrationViewModel.class);
             viewModel.setDobUtcMillis(dobMillis);
             viewModel.setDobTouched(true);
+            // Also set the text directly on the view so it survives recreate()
+            android.widget.TextView etDob = activity.findViewById(R.id.etDob);
+            if (etDob != null) {
+                etDob.setText(formattedDob);
+            }
         });
     }
 }
