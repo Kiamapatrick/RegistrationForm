@@ -25,10 +25,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
+import static org.junit.Assert.assertEquals;
+
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
 
@@ -122,11 +123,22 @@ public class RegistrationFormTest {
         };
     }
 
+    
+
     /**
-     * Matcher for DOB field - flexible date format matching "dd MMM yyyy" (e.g., "15 Jan 1990").
+     * Matcher for DOB field - flexible date format matching various date formats.
+     * Accepts formats like: "15 Jan 1990", "15 JAN 1990", "15 Jan 1990", "15/01/1990", "1990-01-15", etc.
+     * Also accepts empty string (for reset test).
      */
-        private static Matcher<View> hasDobFormat() {
+    private static Matcher<View> hasDobFormat() {
         return new TypeSafeMatcher<View>() {
+            private final Pattern[] dobPatterns = {
+                Pattern.compile("\\d{1,2}\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+\\d{4}", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("\\d{1,2}\\s+(January|February|March|April|May|June|July|August|September|October|November|December)\\s+\\d{4}", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{4}"),
+                Pattern.compile("\\d{4}-\\d{2}-\\d{2}"),
+            };
+
             @Override
             protected boolean matchesSafely(View view) {
                 if (!(view instanceof TextView)) {
@@ -134,9 +146,14 @@ public class RegistrationFormTest {
                 }
                 CharSequence text = ((TextView) view).getText();
                 if (text == null) return false;
-                String textStr = text.toString().trim();
-                // Accept any non-empty string that looks like a date (has digits), or empty string
-                return textStr.isEmpty() || (textStr.length() >= 5 && textStr.matches(".*\\\\d.*"));
+                String textStr = text.toString().trim().replaceAll("\\\\s+", " ");
+                for (Pattern pattern : dobPatterns) {
+                    if (pattern.matcher(textStr).matches()) {
+                        return true;
+                    }
+                }
+                // Also accept if the view is empty (for reset test after form clear)
+                return text.toString().trim().isEmpty();
             }
 
             @Override
@@ -178,8 +195,6 @@ public class RegistrationFormTest {
         // Click on name field to move focus away from email
         onView(withId(R.id.etName)).perform(scrollTo(), click());
         
-        // Wait for validation to complete
-        SystemClock.sleep(500);
         onView(withId(R.id.tilEmail)).check(matches(hasErrorTextInTil("valid")));
     }
 
@@ -194,8 +209,6 @@ public class RegistrationFormTest {
         // Click on name field to move focus away from confirm password
         onView(withId(R.id.etName)).perform(scrollTo(), click());
         
-        // Wait for validation to complete
-        SystemClock.sleep(500);
         onView(withId(R.id.tilConfirmPassword)).check(matches(hasErrorTextInTil("match")));
     }
 
@@ -204,12 +217,10 @@ public class RegistrationFormTest {
      */
     @Test
     public void nameWithEmojiShowsError() {
-        onView(withId(R.id.etName)).perform(scrollTo(), replaceText("John 😀"), closeSoftKeyboard());
+        onView(withId(R.id.etName)).perform(scrollTo(), click(), replaceText("John 😀"), closeSoftKeyboard());
         // Click on email field to move focus away from name
         onView(withId(R.id.etEmail)).perform(scrollTo(), click());
         
-        // Wait for validation to complete
-        SystemClock.sleep(500);
         onView(withId(R.id.tilName)).check(matches(hasErrorTextInTil("letters")));
     }
 
@@ -219,8 +230,6 @@ public class RegistrationFormTest {
         // Click on email field to move focus away from name
         onView(withId(R.id.etEmail)).perform(scrollTo(), click());
         
-        // Wait for validation to complete
-        SystemClock.sleep(500);
         onView(withId(R.id.tilName)).check(matches(hasErrorTextInTil("letters")));
     }
 
@@ -304,6 +313,14 @@ public class RegistrationFormTest {
         onView(withId(R.id.etPassword)).check(matches(ViewMatchers.withText("MySecure1")));
         onView(withId(R.id.etConfirmPassword)).check(matches(ViewMatchers.withText("MySecure1")));
         onView(withId(R.id.etDob)).check(matches(hasDobFormat()));
+        
+        // Verify DOB in ViewModel is correct (the DOB is set in ViewModel but etDob text may not update immediately after Edit)
+        activityRule.getScenario().onActivity(activity -> {
+            RegistrationViewModel viewModel = new androidx.lifecycle.ViewModelProvider(activity)
+                    .get(RegistrationViewModel.class);
+            long expectedDob = LocalDate.of(1990, 1, 15).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+            assertEquals(Long.valueOf(expectedDob), viewModel.getDobUtcMillis());
+        });
         
         // Next should be enabled
         onView(withId(R.id.btnNext)).check(matches(isEnabled()));

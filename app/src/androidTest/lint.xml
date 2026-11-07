@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Disable lint for androidTest to avoid cache locking issues -->
+    <issue id="all" severity="ignore" />
+</lint>
