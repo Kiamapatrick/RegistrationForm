@@ -30,7 +30,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
-}
+    }
 
 dependencies {
 
@@ -47,4 +47,6 @@ dependencies {
     testImplementation(libs.core.testing)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.espresso.intents)
+    androidTestImplementation(libs.espresso.contrib)
 }

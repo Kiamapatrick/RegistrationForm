@@ -51,6 +51,24 @@
     <string name="btn_next">Next</string>
     <string name="content_desc_next">Proceed to next step</string>
 
+    <!-- Summary Screen -->
+    <string name="summary_title">Review Your Details</string>
+    <string name="summary_subtitle">Please verify the information below before confirming</string>
+    <string name="summary_name_label">Full Name</string>
+    <string name="summary_dob_label">Date of Birth</string>
+    <string name="summary_email_label">Email</string>
+    <string name="btn_edit_details">Edit Details</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="content_desc_edit_details">Go back to edit your details</string>
+    <string name="content_desc_confirm">Confirm registration and submit</string>
+
+    <!-- Success State -->
+    <string name="success_message">Registration Confirmed!</string>
+    <string name="success_subtitle">Your details have been submitted successfully.</string>
+    <string name="success_icon_desc">Success checkmark icon</string>
+    <string name="btn_done">Done</string>
+    <string name="content_desc_done">Finish and clear the form</string>
+
     <!-- Date Format -->
     <string name="date_format_display">dd MMM yyyy</string>
 </resources>

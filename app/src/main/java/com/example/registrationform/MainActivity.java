@@ -1,13 +1,18 @@
 package com.example.registrationform;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -47,6 +52,24 @@ public class MainActivity extends AppCompatActivity {
 
     // Guard against double date picker opening
     private boolean isDatePickerShowing = false;
+
+    // ActivityResultLauncher for SummaryActivity
+    private final ActivityResultLauncher<Intent> summaryActivityLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    new ActivityResultCallback<ActivityResult>() {
+                        @Override
+                        public void onActivityResult(ActivityResult result) {
+                            if (result.getResultCode() == RESULT_OK) {
+                                // User confirmed in SummaryActivity - reset form
+                                viewModel.reset();
+                                clearFormFields();
+                            }
+                            // Enable btnNext based on current form validity.
+                            // After RESULT_OK: form is reset (invalid) -> button stays disabled.
+                            // After RESULT_CANCELED (Edit details/back): form unchanged -> enabled if valid.
+                            btnNext.setEnabled(Boolean.TRUE.equals(viewModel.getIsFormValid().getValue()));
+                        }
+                    });
 
     private RegistrationViewModel viewModel;
 
@@ -184,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateDobField() {
         if (viewModel.getDobUtcMillis() != null) {
             // MaterialDatePicker returns UTC millis, so format with UTC timezone to avoid off-by-one-day bug
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             etDob.setText(sdf.format(viewModel.getDobUtcMillis()));
             tilDob.setError(null);
@@ -282,16 +305,19 @@ public class MainActivity extends AppCompatActivity {
             viewModel.setAllTouched();
 
             if (Boolean.TRUE.equals(viewModel.getIsFormValid().getValue())) {
-                // Form is valid - proceed to next step
+                // Form is valid - proceed to summary screen
                 String name = etName.getText().toString().trim();
-                String dob = etDob.getText().toString().trim();
                 String email = etEmail.getText().toString().trim();
+                Long dobUtcMillis = viewModel.getDobUtcMillis();
 
-                Toast.makeText(this,
-                        "Form submitted!\nName: " + name + "\nDOB: " + dob + "\nEmail: " + email,
-                        Toast.LENGTH_LONG).show();
+                RegistrationData data = new RegistrationData(name, email, dobUtcMillis);
+                Intent intent = new Intent(this, SummaryActivity.class);
+                intent.putExtra(RegistrationData.EXTRA_KEY, data);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-                // TODO: Navigate to next screen or process registration
+                // Disable btnNext to prevent double-click while launch is in progress
+                btnNext.setEnabled(false);
+                summaryActivityLauncher.launch(intent);
             }
         });
     }
@@ -449,5 +475,25 @@ public class MainActivity extends AppCompatActivity {
             etConfirmPassword.setText(viewModel.getConfirmPassword());
             etConfirmPassword.setSelection(viewModel.getConfirmPassword().length());
         }
+    }
+
+    /**
+     * Clears all form fields in the UI after successful confirmation.
+     */
+    private void clearFormFields() {
+        etName.setText("");
+        etDob.setText("");
+        etEmail.setText("");
+        etPassword.setText("");
+        etConfirmPassword.setText("");
+
+        tilName.setError(null);
+        tilDob.setError(null);
+        tilEmail.setError(null);
+        tilPassword.setError(null);
+        tilConfirmPassword.setError(null);
+
+        passwordStrengthBar.setProgress(0, false);
+        passwordStrengthLabel.setVisibility(View.GONE);
     }
 }

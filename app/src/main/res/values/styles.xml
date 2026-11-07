@@ -47,4 +47,14 @@
         <item name="elevation">0dp</item>
         <item name="rippleColor">?attr/colorOnPrimary</item>
     </style>
+
+    <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="cornerRadius">@dimen/button_radius</item>
+        <item name="android:textSize">@dimen/text_size_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="rippleColor">?attr/colorOnPrimary</item>
+    </style>
 </resources>

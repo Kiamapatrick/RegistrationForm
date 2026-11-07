@@ -185,6 +185,35 @@ public class RegistrationViewModel extends ViewModel {
         validateAndUpdate();
     }
 
+    /**
+     * Resets all form fields, touched flags, errors, and strength level to initial state.
+     * Called after successful confirmation in SummaryActivity.
+     */
+    public void reset() {
+        name = "";
+        dobUtcMillis = null;
+        email = "";
+        password = "";
+        confirmPassword = "";
+
+        nameTouched = false;
+        dobTouched = false;
+        emailTouched = false;
+        passwordTouched = false;
+        confirmPasswordTouched = false;
+
+        nameError.setValue(FormValidator.Error.NONE);
+        dobError.setValue(FormValidator.Error.NONE);
+        emailError.setValue(FormValidator.Error.NONE);
+        passwordError.setValue(FormValidator.Error.NONE);
+        confirmPasswordError.setValue(FormValidator.Error.NONE);
+
+        passwordStrengthProgress.setValue(0);
+        passwordStrengthLevel.setValue(PasswordStrength.Level.WEAK);
+
+        isFormValid.setValue(false);
+    }
+
     private void updatePasswordStrength() {
         PasswordStrength.Level level = PasswordStrength.evaluate(password);
         passwordStrengthProgress.setValue(PasswordStrength.progress(password));

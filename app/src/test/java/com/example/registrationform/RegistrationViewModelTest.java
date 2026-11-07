@@ -514,6 +514,55 @@ public class RegistrationViewModelTest {
         assertEquals(FormValidator.Error.PASSWORD_MISMATCH, getValue(viewModel.getConfirmPasswordError()));
     }
 
+    @Test
+    public void reset_clearsAllFieldsAndErrors() {
+        // Set up form with valid data
+        viewModel.setName("John Doe");
+        viewModel.setNameTouched(true);
+        viewModel.setDobUtcMillis(631152000000L); // 1990-01-01 UTC
+        viewModel.setDobTouched(true);
+        viewModel.setEmail("john@example.com");
+        viewModel.setEmailTouched(true);
+        viewModel.setPassword("MySecure1");
+        viewModel.setPasswordTouched(true);
+        viewModel.setConfirmPassword("MySecure1");
+        viewModel.setConfirmPasswordTouched(true);
+
+        // Verify form is valid
+        assertTrue(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+
+        // Call reset
+        viewModel.reset();
+
+        // Verify all fields are cleared
+        assertEquals("", viewModel.getName());
+        assertNull(viewModel.getDobUtcMillis());
+        assertEquals("", viewModel.getEmail());
+        assertEquals("", viewModel.getPassword());
+        assertEquals("", viewModel.getConfirmPassword());
+
+        // Verify all touched flags are false
+        assertFalse(viewModel.isNameTouched());
+        assertFalse(viewModel.isDobTouched());
+        assertFalse(viewModel.isEmailTouched());
+        assertFalse(viewModel.isPasswordTouched());
+        assertFalse(viewModel.isConfirmPasswordTouched());
+
+        // Verify all errors are NONE
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getNameError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getDobError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getEmailError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getPasswordError()));
+        assertEquals(FormValidator.Error.NONE, getValue(viewModel.getConfirmPasswordError()));
+
+        // Verify strength is reset
+        assertEquals(Integer.valueOf(0), getValue(viewModel.getPasswordStrengthProgress()));
+        assertEquals(PasswordStrength.Level.WEAK, getValue(viewModel.getPasswordStrengthLevel()));
+
+        // Verify form is invalid
+        assertFalse(Boolean.TRUE.equals(getValue(viewModel.getIsFormValid())));
+    }
+
     // Helper to get LiveData value synchronously (works with InstantTaskExecutorRule)
     private <T> T getValue(LiveData<T> liveData) {
         return liveData.getValue();

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -96,9 +97,7 @@ public final class FormValidator {
             return ValidationResult.invalid(Error.NAME_INVALID_CHARS);
         }
         // Count letters only (not combining marks) - must have at least 2
-        long letterCount = normalized.codePoints().filter(c -> Character.isLetter(c) && !Character.isSpaceChar(c)).count();
-        // Better: count only \p{L} category (letters, not marks)
-        long letterCount2 = 0;
+        long letterCount = 0;
         for (int i = 0; i < normalized.length(); ) {
             int cp = normalized.codePointAt(i);
             if (Character.getType(cp) == Character.UPPERCASE_LETTER ||
@@ -106,11 +105,11 @@ public final class FormValidator {
                 Character.getType(cp) == Character.TITLECASE_LETTER ||
                 Character.getType(cp) == Character.MODIFIER_LETTER ||
                 Character.getType(cp) == Character.OTHER_LETTER) {
-                letterCount2++;
+                letterCount++;
             }
             i += Character.charCount(cp);
         }
-        if (letterCount2 < 2) {
+        if (letterCount < 2) {
             return ValidationResult.invalid(Error.NAME_TOO_SHORT);
         }
         return ValidationResult.valid();
@@ -198,8 +197,8 @@ public final class FormValidator {
         if (!hasDigit) {
             return ValidationResult.invalid(Error.PASSWORD_MISSING_DIGIT);
         }
-        // Check against common passwords (case-insensitive)
-        if (COMMON_PASSWORDS.contains(password.toLowerCase())) {
+        // Check against common passwords (case-insensitive, locale-insensitive)
+        if (COMMON_PASSWORDS.contains(password.toLowerCase(Locale.ROOT))) {
             return ValidationResult.invalid(Error.PASSWORD_TOO_COMMON);
         }
         return ValidationResult.valid();
