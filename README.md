@@ -1,6 +1,6 @@
 # Registration Form
 
-A modern Android registration form built with **Java** and **Material Design 3** components. This app demonstrates best practices for form validation, date picking, ViewModel-based state management, and accessibility.
+A modern Android registration form built with **Java** and **Material Design 3** components. This app demonstrates best practices for form validation, date picking, ViewModel-based state management, and accessibility. Restrained navy palette, hairline outlines, system serif/sans fonts.
 
 ## Features
 
@@ -139,12 +139,7 @@ Uses `MaterialDatePicker` with `DateValidatorPointBackward` capped at 18 years a
 - Touch targets ≥ 48 dp (button height 56 dp).
 
 ### Dark Mode
-Complete `values-night` palette (Material 3 tonal pairs). All text/background contrasts ≥ 4.5:1 (WCAG AA). Verified:
-- Title (onSurface on background): 13.23:1
-- Subtitle/Hint (onSurfaceVariant on background): 10.02:1
-- Error text (error on surface): 10.00:1
-- Strength label (onSurfaceVariant on surface): 10.02:1
-- Button text (onPrimary on primary): 7.71:1
+Text pairs meet WCAG AA (4.5:1) and field outlines and focus rings meet 3:1 in both light and dark themes, using the navy/slate palette defined in `values/colors.xml` and `values-night/colors.xml`.
 
 ## Dependencies (from `gradle/libs.versions.toml`)
 
