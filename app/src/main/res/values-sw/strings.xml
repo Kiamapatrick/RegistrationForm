@@ -7,6 +7,10 @@
     <string name="registration_title">Usajili</string>
     <string name="registration_subtitle">Unda akaunti yako kuanzia hapa</string>
 
+    <!-- Section Labels -->
+    <string name="section_personal_details">Maelezo ya kibinafsi</string>
+    <string name="section_account_security">Usalama wa akaunti</string>
+
     <!-- Name Field -->
     <string name="hint_full_name">Jina Kamili</string>
     <string name="error_name_required">Tafadhali ingiza jina lako</string>
