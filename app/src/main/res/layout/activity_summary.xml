@@ -17,25 +17,24 @@
         android:paddingTop="@dimen/screen_padding_top"
         android:paddingBottom="@dimen/screen_padding">
 
-        <!-- Title -->
+        <!-- Header Block -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/summary_title"
-            android:textAppearance="@style/TextAppearance.App.Title"
+            android:textAppearance="@style/TextAppearance.App.DisplayTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Subtitle -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/title_subtitle_spacing"
             android:text="@string/summary_subtitle"
-            android:textAppearance="@style/TextAppearance.App.Subtitle"
+            android:textAppearance="@style/TextAppearance.App.Caption"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
@@ -49,9 +48,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="@dimen/corner_radius"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            style="@style/Widget.App.Card"
             android:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -62,100 +59,98 @@
                 <!-- Name Row -->
                 <TextView
                     android:id="@+id/tvNameLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/summary_name_label"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
-                    android:textStyle="bold"
+                    android:textAppearance="@style/TextAppearance.App.SectionLabel"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tvNameValue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/field_spacing"
-                    android:layout_marginEnd="@dimen/screen_padding"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
-                    app:layout_constraintStart_toEndOf="@id/tvNameLabel"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.App.Body"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvNameLabel"
                     tools:text="Jane Smith" />
 
                 <!-- Divider -->
                 <View
                     android:id="@+id/divider1"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
+                    android:layout_height="@dimen/divider_thickness"
                     android:layout_marginTop="@dimen/field_spacing"
                     android:layout_marginBottom="@dimen/field_spacing"
                     android:background="?attr/colorOutline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvNameLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/tvNameValue" />
 
                 <!-- DOB Row -->
                 <TextView
                     android:id="@+id/tvDobLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/summary_dob_label"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
-                    android:textStyle="bold"
+                    android:textAppearance="@style/TextAppearance.App.SectionLabel"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/divider1" />
 
                 <TextView
                     android:id="@+id/tvDobValue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/field_spacing"
-                    android:layout_marginEnd="@dimen/screen_padding"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
-                    app:layout_constraintStart_toEndOf="@id/tvDobLabel"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.App.Body"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider1"
+                    app:layout_constraintTop_toBottomOf="@id/tvDobLabel"
                     tools:text="15 Jan 1990" />
 
                 <!-- Divider -->
                 <View
                     android:id="@+id/divider2"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
+                    android:layout_height="@dimen/divider_thickness"
                     android:layout_marginTop="@dimen/field_spacing"
                     android:layout_marginBottom="@dimen/field_spacing"
                     android:background="?attr/colorOutline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvDobLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/tvDobValue" />
 
                 <!-- Email Row -->
                 <TextView
                     android:id="@+id/tvEmailLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/summary_email_label"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
-                    android:textStyle="bold"
+                    android:textAppearance="@style/TextAppearance.App.SectionLabel"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/divider2" />
 
                 <TextView
                     android:id="@+id/tvEmailValue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/field_spacing"
-                    android:layout_marginEnd="@dimen/screen_padding"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
-                    app:layout_constraintStart_toEndOf="@id/tvEmailLabel"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.App.Body"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider2"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmailLabel"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:text="jane@example.com" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Success Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/successCard"
             android:layout_width="0dp"
@@ -164,9 +159,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="@dimen/corner_radius"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            style="@style/Widget.App.Card"
             android:visibility="gone">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -184,7 +177,8 @@
                     android:tint="?attr/colorPrimary"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
 
                 <TextView
                     android:id="@+id/tvSuccessMessage"
@@ -192,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/field_spacing"
                     android:text="@string/success_message"
-                    android:textAppearance="@style/TextAppearance.App.Title"
+                    android:textAppearance="@style/TextAppearance.App.DisplayTitle"
                     android:gravity="center"
                     android:textAlignment="center"
                     app:layout_constraintStart_toStartOf="parent"
@@ -205,7 +199,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/title_subtitle_spacing"
                     android:text="@string/success_subtitle"
-                    android:textAppearance="@style/TextAppearance.App.Subtitle"
+                    android:textAppearance="@style/TextAppearance.App.Caption"
                     android:gravity="center"
                     android:textAlignment="center"
                     app:layout_constraintStart_toStartOf="parent"
@@ -219,7 +213,7 @@
                     android:layout_marginTop="@dimen/button_top_margin"
                     android:text="@string/btn_done"
                     android:contentDescription="@string/content_desc_done"
-                    style="@style/Widget.App.Button"
+                    style="@style/Widget.App.Button.Primary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvSuccessSubtitle" />
@@ -247,7 +241,7 @@
                 android:layout_marginEnd="@dimen/field_spacing"
                 android:text="@string/btn_edit_details"
                 android:contentDescription="@string/content_desc_edit_details"
-                style="@style/Widget.App.Button.Outlined" />
+                style="@style/Widget.App.Button.Secondary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnConfirm"
@@ -256,7 +250,7 @@
                 android:layout_marginStart="@dimen/field_spacing"
                 android:text="@string/btn_confirm"
                 android:contentDescription="@string/content_desc_confirm"
-                style="@style/Widget.App.Button" />
+                style="@style/Widget.App.Button.Primary" />
 
         </LinearLayout>
 

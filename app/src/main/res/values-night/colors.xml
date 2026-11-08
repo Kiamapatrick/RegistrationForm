@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand colors - Dark theme -->
-    <color name="primary">#D0BCFF</color>
-    <color name="onPrimary">#381E72</color>
-    <color name="primaryContainer">#4F378B</color>
-    <color name="onPrimaryContainer">#EADDFF</color>
-    <color name="secondary">#CCC2DC</color>
-    <color name="onSecondary">#332D41</color>
-    <color name="secondaryContainer">#4A4458</color>
-    <color name="onSecondaryContainer">#E8DEF8</color>
-    <color name="tertiary">#EFB8C8</color>
-    <color name="onTertiary">#492532</color>
-    <color name="tertiaryContainer">#633B48</color>
-    <color name="onTertiaryContainer">#FFD8E4</color>
-    <color name="error">#F2B8B5</color>
-    <color name="onError">#601410</color>
-    <color name="errorContainer">#8C1D18</color>
-    <color name="onErrorContainer">#F9DEDC</color>
-    <color name="background">#1D1B20</color>
-    <color name="onBackground">#E6E1E5</color>
-    <color name="surface">#1D1B20</color>
-    <color name="onSurface">#E6E1E5</color>
-    <color name="surfaceVariant">#49454F</color>
-    <color name="onSurfaceVariant">#CAC4D0</color>
-    <color name="outline">#938F99</color>
-    <color name="outlineVariant">#49454F</color>
+    <!-- Executive/Editorial palette - Dark theme -->
+    <color name="primary">#A8C0E0</color>
+    <color name="onPrimary">#1B2A4A</color>
+    <color name="primaryContainer">#2D3A4F</color>
+    <color name="onPrimaryContainer">#D6E4F0</color>
+    <color name="secondary">#8A9BB8</color>
+    <color name="onSecondary">#1B2A4A</color>
+    <color name="secondaryContainer">#2D3A4F</color>
+    <color name="onSecondaryContainer">#E8ECEF</color>
+    <color name="tertiary">#D4A843</color>
+    <color name="onTertiary">#1B2A4A</color>
+    <color name="tertiaryContainer">#5D4E00</color>
+    <color name="onTertiaryContainer">#FFF3D4</color>
+    <color name="error">#E8A0A0</color>
+    <color name="onError">#1B2A4A</color>
+    <color name="errorContainer">#5D0000</color>
+    <color name="onErrorContainer">#FCD8D8</color>
+    <color name="background">#1A2230</color>
+    <color name="onBackground">#E8ECEF</color>
+    <color name="surface">#222B3D</color>
+    <color name="onSurface">#E8ECEF</color>
+    <color name="surfaceVariant">#2D3A4F</color>
+    <color name="onSurfaceVariant">#A0B0C8</color>
+    <color name="outline">#8090AB</color>
+    <color name="outlineVariant">#3A4A65</color>
     <color name="shadow">#000000</color>
     <color name="scrim">#000000</color>
-    <color name="inverseSurface">#E6E1E5</color>
-    <color name="inverseOnSurface">#333033</color>
-    <color name="inversePrimary">#6750A4</color>
+    <color name="inverseSurface">#F0F4F8</color>
+    <color name="inverseOnSurface">#1B2A4A</color>
+    <color name="inversePrimary">#1B2A4A</color>
+
+    <!-- Strength colors -->
+    <color name="strength_weak">#E8A0A0</color>
+    <color name="strength_fair">#D4A843</color>
+    <color name="strength_strong">#7FD88F</color>
 
     <!-- Legacy colors for compatibility -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="textPrimary">#E6E1E5</color>
-    <color name="textSecondary">#CAC4D0</color>
+    <color name="textPrimary">#E8ECEF</color>
+    <color name="textSecondary">#A0B0C8</color>
 </resources>
