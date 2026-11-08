@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Spacing -->
+    <!-- Spacing scale: 4, 8, 12, 16, 24, 32 -->
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+
+    <!-- Semantic spacing aliases -->
     <dimen name="screen_padding">24dp</dimen>
     <dimen name="screen_padding_top">32dp</dimen>
     <dimen name="field_spacing">16dp</dimen>
@@ -9,10 +17,13 @@
     <dimen name="button_top_margin">32dp</dimen>
     <dimen name="strength_margin_top">8dp</dimen>
     <dimen name="strength_label_margin">8dp</dimen>
+    <dimen name="section_spacing">24dp</dimen>
+    <dimen name="section_label_spacing">12dp</dimen>
 
     <!-- Corner radius -->
     <dimen name="corner_radius">12dp</dimen>
-    <dimen name="button_radius">28dp</dimen>
+    <dimen name="button_radius">12dp</dimen>
+    <dimen name="card_radius">16dp</dimen>
 
     <!-- Button -->
     <dimen name="button_height">56dp</dimen>
@@ -21,4 +32,16 @@
     <dimen name="text_size_title">28sp</dimen>
     <dimen name="text_size_subtitle">14sp</dimen>
     <dimen name="text_size_button">16sp</dimen>
+    <dimen name="text_size_section_label">14sp</dimen>
+    <dimen name="text_size_body">16sp</dimen>
+    <dimen name="text_size_caption">12sp</dimen>
+
+    <!-- Stroke widths -->
+    <dimen name="stroke_hairline">1dp</dimen>
+    <dimen name="stroke_focused">2dp</dimen>
+    <dimen name="divider_thickness">1dp</dimen>
+
+    <!-- Strength bar -->
+    <dimen name="strength_track_height">3dp</dimen>
+    <dimen name="strength_track_thickness">3dp</dimen>
 </resources>

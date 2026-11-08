@@ -6,6 +6,10 @@
     <string name="registration_title">Registration</string>
     <string name="registration_subtitle">Create your account to get started</string>
 
+    <!-- Section Labels -->
+    <string name="section_personal_details">Personal details</string>
+    <string name="section_account_security">Account security</string>
+
     <!-- Name Field -->
     <string name="hint_full_name">Full Name</string>
     <string name="error_name_required">Please enter your name</string>

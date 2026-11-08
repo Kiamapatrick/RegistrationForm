@@ -17,39 +17,50 @@
         android:paddingTop="@dimen/screen_padding_top"
         android:paddingBottom="@dimen/screen_padding">
 
-        <!-- Title -->
+        <!-- Header Block -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/registration_title"
-            android:textAppearance="@style/TextAppearance.App.Title"
+            android:textAppearance="@style/TextAppearance.App.DisplayTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Subtitle -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/title_subtitle_spacing"
             android:text="@string/registration_subtitle"
-            android:textAppearance="@style/TextAppearance.App.Subtitle"
+            android:textAppearance="@style/TextAppearance.App.Caption"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <!-- Section: Personal Details -->
+        <TextView
+            android:id="@+id/tvSectionPersonal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_spacing"
+            android:text="@string/section_personal_details"
+            android:textAppearance="@style/TextAppearance.App.SectionLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
         <!-- Name Field -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/title_to_fields_spacing"
+            android:layout_marginTop="@dimen/section_label_spacing"
             android:hint="@string/hint_full_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
+            app:layout_constraintTop_toBottomOf="@id/tvSectionPersonal"
             style="@style/Widget.App.TextInputLayout"
             app:startIconDrawable="@drawable/ic_person"
             app:startIconContentDescription="@string/content_desc_name"
@@ -95,16 +106,28 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Section: Account Security -->
+        <TextView
+            android:id="@+id/tvSectionSecurity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_spacing"
+            android:text="@string/section_account_security"
+            android:textAppearance="@style/TextAppearance.App.SectionLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilDob" />
+
         <!-- Email Field -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/field_spacing"
+            android:layout_marginTop="@dimen/section_label_spacing"
             android:hint="@string/hint_email"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilDob"
+            app:layout_constraintTop_toBottomOf="@id/tvSectionSecurity"
             style="@style/Widget.App.TextInputLayout"
             app:startIconDrawable="@drawable/ic_email"
             app:startIconContentDescription="@string/content_desc_email"
@@ -168,12 +191,10 @@
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/passwordStrengthBar"
                 android:layout_width="0dp"
-                android:layout_height="4dp"
+                android:layout_height="@dimen/strength_track_height"
                 android:layout_weight="1"
                 android:layout_marginEnd="@dimen/strength_label_margin"
-                app:indicatorColor="@color/primary"
-                app:trackColor="@color/primaryContainer"
-                app:trackThickness="4dp"
+                style="@style/Widget.App.StrengthBar"
                 android:contentDescription="@string/password_strength_content_desc"
                 android:importantForAccessibility="yes" />
 
@@ -181,7 +202,7 @@
                 android:id="@+id/passwordStrengthLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.App.Small"
+                android:textAppearance="@style/TextAppearance.App.Caption"
                 android:contentDescription="@string/password_strength_content_desc"
                 android:accessibilityLiveRegion="polite"
                 tools:text="Weak" />
@@ -216,7 +237,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Next Button -->
+        <!-- Next Button - pinned at bottom -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
             android:layout_width="0dp"
@@ -224,7 +245,7 @@
             android:layout_marginTop="@dimen/button_top_margin"
             android:text="@string/btn_next"
             android:contentDescription="@string/content_desc_next"
-            style="@style/Widget.App.Button"
+            style="@style/Widget.App.Button.Primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilConfirmPassword"
