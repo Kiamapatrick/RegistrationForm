@@ -44,6 +44,10 @@
 
         <!-- Material 3 attributes -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <!-- Shared axis transition for screen transitions -->
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_axis_forward</item>
+        <item name="android:windowSharedElementExitTransition">@transition/shared_axis_backward</item>
     </style>
 
     <style name="Theme.RegistrationForm" parent="Base.Theme.RegistrationForm" />
