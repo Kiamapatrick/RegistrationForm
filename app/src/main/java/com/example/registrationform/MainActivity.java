@@ -496,10 +496,12 @@ public class MainActivity extends AppCompatActivity {
 
                 // Animate color transition
                 if (!isMotionReduced(this)) {
+                    int startColor = androidx.core.content.ContextCompat.getColor(this, R.color.strength_weak);
+                    int endColor = androidx.core.content.ContextCompat.getColor(this, colorRes);
                     android.animation.ValueAnimator colorAnim = android.animation.ValueAnimator.ofObject(
                             new android.animation.ArgbEvaluator(),
-                            passwordStrengthBar.getIndicatorColor(),
-                            androidx.core.content.ContextCompat.getColor(this, colorRes)
+                            startColor,
+                            endColor
                     );
                     colorAnim.setDuration(getResources().getInteger(R.integer.motion_duration_short));
                     colorAnim.addUpdateListener(anim -> {
