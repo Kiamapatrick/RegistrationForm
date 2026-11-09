@@ -83,8 +83,10 @@ public class SummaryActivity extends AppCompatActivity {
             showSuccessState();
         }
 
-        // Entrance animations
-        runEntranceAnimations();
+        // Entrance animations only on initial creation
+        if (savedInstanceState == null) {
+            runEntranceAnimations();
+        }
     }
 
     @Override

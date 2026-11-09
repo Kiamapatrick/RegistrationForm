@@ -117,8 +117,10 @@ public class MainActivity extends AppCompatActivity {
         // Restore date picker listeners if picker is already showing (e.g., after rotation)
         restoreDatePickerIfShowing();
 
-        // Entrance animations
-        runEntranceAnimations();
+        // Entrance animations only on initial creation (not on rotation)
+        if (savedInstanceState == null) {
+            runEntranceAnimations();
+        }
     }
 
     private void setupBlobLayer() {
