@@ -646,9 +646,8 @@ public class MainActivity extends AppCompatActivity {
         View subtitle = findViewById(R.id.tvSubtitle);
         View card1 = findViewById(R.id.cardPersonal);
         View card2 = findViewById(R.id.cardSecurity);
-        View btn = findViewById(R.id.btnNext);
 
-        View[] views = {header, subtitle, findViewById(R.id.cardPersonal), findViewById(R.id.cardSecurity), btnNext};
+        View[] views = {header, subtitle, card1, card2};
         int stagger = getResources().getInteger(R.integer.motion_duration_entrance_stagger);
 
         for (int i = 0; i < views.length; i++) {
@@ -662,6 +661,10 @@ public class MainActivity extends AppCompatActivity {
                     .setDuration(getResources().getInteger(R.integer.motion_duration_medium))
                     .setStartDelay(i * stagger)
                     .setInterpolator(new OvershootInterpolator(1.2f))
+                    .withEndAction(() -> {
+                        view.setAlpha(1f);
+                        view.setTranslationY(0f);
+                    })
                     .start();
         }
     }

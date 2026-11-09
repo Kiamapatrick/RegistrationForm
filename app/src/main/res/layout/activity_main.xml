@@ -11,9 +11,10 @@
     <LinearLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:background="?android:colorBackground"
+        android:weightSum="2"
         android:paddingStart="@dimen/screen_padding"
         android:paddingEnd="@dimen/screen_padding"
         android:paddingTop="@dimen/screen_padding_top"
@@ -39,7 +40,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPersonal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="@dimen/title_to_fields_spacing"
             style="@style/Widget.App.GlassCard">
 
@@ -126,15 +128,15 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardSecurity"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="300dp"
-            android:layout_marginTop="@dimen/section_spacing"
-            android:background="@color/glass_fill_strong"
-            style="@style/Widget.App.GlassCard">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            style="@style/Widget.App.GlassCard"
+            app:cardBackgroundColor="@color/glass_fill_strong">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="300dp"
                 android:orientation="vertical"
                 android:padding="@dimen/screen_padding">
 
