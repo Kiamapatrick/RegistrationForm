@@ -88,6 +88,9 @@
                     app:startIconDrawable="@drawable/ic_person"
                     app:startIconContentDescription="@string/content_desc_name"
                     app:startIconTint="@color/text_input_icon_tint"
+                    app:endIconDrawable="@drawable/ic_check_animated"
+                    app:endIconContentDescription="@string/content_desc_valid"
+                    app:endIconTint="@color/strength_strong"
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -175,6 +178,9 @@
                     app:startIconDrawable="@drawable/ic_email"
                     app:startIconContentDescription="@string/content_desc_email"
                     app:startIconTint="@color/text_input_icon_tint"
+                    app:endIconDrawable="@drawable/ic_check_animated"
+                    app:endIconContentDescription="@string/content_desc_valid"
+                    app:endIconTint="@color/strength_strong"
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -261,7 +267,9 @@
                     app:startIconContentDescription="@string/content_desc_confirm_password"
                     app:startIconTint="@color/text_input_icon_tint"
                     app:endIconMode="password_toggle"
-                    app:endIconTint="@color/text_input_icon_tint"
+                    app:endIconTint="@color/strength_strong"
+                    app:endIconDrawable="@drawable/ic_check_animated"
+                    app:endIconContentDescription="@string/content_desc_valid"
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText

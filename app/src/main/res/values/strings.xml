@@ -72,6 +72,7 @@
     <string name="success_icon_desc">Success checkmark icon</string>
     <string name="btn_done">Done</string>
     <string name="content_desc_done">Finish and clear the form</string>
+    <string name="content_desc_valid">Valid input</string>
 
     <!-- Date Format -->
     <string name="date_format_display">dd MMM yyyy</string>

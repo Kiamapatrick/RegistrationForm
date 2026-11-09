@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
     // Guard against double date picker opening
     private boolean isDatePickerShowing = false;
 
+    // Track if form has been valid before (for pulse animation)
+    private boolean hasBeenValid = false;
+
     // ActivityResultLauncher for SummaryActivity
     private final ActivityResultLauncher<Intent> summaryActivityLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -470,21 +473,42 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getPasswordStrengthLevel().observe(this, level -> {
             if (level != null) {
                 int stringRes;
+                int colorRes;
                 switch (level) {
                     case WEAK:
                         stringRes = R.string.password_strength_weak;
+                        colorRes = R.color.strength_weak;
                         break;
                     case FAIR:
                         stringRes = R.string.password_strength_fair;
+                        colorRes = R.color.strength_fair;
                         break;
                     case STRONG:
                         stringRes = R.string.password_strength_strong;
+                        colorRes = R.color.strength_strong;
                         break;
                     default:
                         stringRes = R.string.password_strength_weak;
+                        colorRes = R.color.strength_weak;
                 }
                 passwordStrengthLabel.setText(stringRes);
                 passwordStrengthLabel.setVisibility(View.VISIBLE);
+
+                // Animate color transition
+                if (!isMotionReduced(this)) {
+                    android.animation.ValueAnimator colorAnim = android.animation.ValueAnimator.ofObject(
+                            new android.animation.ArgbEvaluator(),
+                            passwordStrengthBar.getIndicatorColor(),
+                            androidx.core.content.ContextCompat.getColor(this, colorRes)
+                    );
+                    colorAnim.setDuration(getResources().getInteger(R.integer.motion_duration_short));
+                    colorAnim.addUpdateListener(anim -> {
+                        passwordStrengthBar.setIndicatorColor((Integer) anim.getAnimatedValue());
+                    });
+                    colorAnim.start();
+                } else {
+                    passwordStrengthBar.setIndicatorColor(androidx.core.content.ContextCompat.getColor(this, colorRes));
+                }
             } else {
                 passwordStrengthLabel.setVisibility(View.GONE);
             }
@@ -494,7 +518,20 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getIsFormValid().observe(this, isValid -> {
             boolean enabled = Boolean.TRUE.equals(isValid);
             animateButtonState(btnNext, enabled);
+
+            // Pulse once when form first becomes valid
+            if (enabled && !hasBeenValid) {
+                hasBeenValid = true;
+                pulseButton(btnNext);
+            }
         });
+
+        // Field validity animations (check icon fade-in, error shake)
+        observeFieldValidity(tilName, viewModel.getNameError());
+        observeFieldValidity(tilEmail, viewModel.getEmailError());
+        observeFieldValidity(tilPassword, viewModel.getPasswordError());
+        observeFieldValidity(tilConfirmPassword, viewModel.getConfirmPasswordError());
+        observeFieldValidity(tilDob, viewModel.getDobError());
     }
 
     /**
@@ -646,6 +683,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Pulses the button once (scale 1.0 -> 1.05 -> 1.0) with a spring.
+     */
+    private void pulseButton(MaterialButton button) {
+        if (isMotionReduced(this)) return;
+
+        SpringForce springForce = new SpringForce(1f);
+        springForce.setStiffness(getResources().getInteger(R.integer.spring_stiffness));
+        springForce.setDampingRatio(SPRING_DAMPING_RATIO);
+
+        SpringAnimation scaleX = new SpringAnimation(button, DynamicAnimation.SCALE_X);
+        SpringAnimation scaleY = new SpringAnimation(button, DynamicAnimation.SCALE_Y);
+
+        scaleX.setSpring(springForce);
+        scaleY.setSpring(springForce);
+
+        // Start from 1.05
+        button.setScaleX(1.05f);
+        button.setScaleY(1.05f);
+
+        scaleX.setSpring(springForce);
+        scaleY.setSpring(springForce);
+
+        scaleX.start();
+        scaleY.start();
+    }
+
+    /**
      * Checks if motion is reduced via system settings or power save mode.
      */
     private boolean isMotionReduced(Context context) {
@@ -711,5 +775,38 @@ public class MainActivity extends AppCompatActivity {
 
         scaleX.start();
         scaleY.start();
+    }
+
+    /**
+     * Observes field validity and animates check icon / shake on error.
+     */
+    private void observeFieldValidity(TextInputLayout til, androidx.lifecycle.LiveData<FormValidator.Error> errorLiveData) {
+        errorLiveData.observe(this, new androidx.lifecycle.Observer<FormValidator.Error>() {
+            @Override
+            public void onChanged(FormValidator.Error error) {
+                boolean isError = error != null && error != FormValidator.Error.NONE;
+                boolean wasError = til.isErrorEnabled() && til.getError() != null;
+
+                // Animate check icon
+                android.graphics.drawable.Drawable endIcon = til.getEndIconDrawable();
+
+                if (!isError && !wasError) {
+                    // Field became valid - animate check icon in
+                    if (endIcon instanceof android.graphics.drawable.AnimatedVectorDrawable) {
+                        if (!isMotionReduced(MainActivity.this)) {
+                            ((android.graphics.drawable.AnimatedVectorDrawable) endIcon).start();
+                        } else {
+                            ((android.graphics.drawable.AnimatedVectorDrawable) endIcon).reset();
+                        }
+                    }
+                } else if (isError && !wasError) {
+                    // Field became invalid - shake the field
+                    if (!isMotionReduced(MainActivity.this)) {
+                        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake_horizontal);
+                        til.startAnimation(shake);
+                    }
+                }
+            }
+        });
     }
 }

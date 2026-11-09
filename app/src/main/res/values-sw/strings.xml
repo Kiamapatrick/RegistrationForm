@@ -73,6 +73,7 @@
     <string name="success_icon_desc">Aikoni ya alama ya mafanikio</string>
     <string name="btn_done">Kamilisha</string>
     <string name="content_desc_done">Kamilisha na futa fomu</string>
+    <string name="content_desc_valid">Kiingilio sahihi</string>
 
     <!-- Date Format - Swahili locale will use MMM format with Swahili month names -->
     <string name="date_format_display">dd MMM yyyy</string>
