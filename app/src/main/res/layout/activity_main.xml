@@ -141,6 +141,7 @@
             android:layout_height="wrap_content"
             android:minHeight="300dp"
             android:layout_marginTop="@dimen/section_spacing"
+            android:background="@color/glass_fill_strong"
             style="@style/Widget.App.GlassCard">
 
             <LinearLayout
