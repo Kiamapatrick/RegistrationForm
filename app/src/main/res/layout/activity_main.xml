@@ -284,6 +284,16 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Next Button - inside the card, after confirm password -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/button_top_margin"
+                    android:text="@string/btn_next"
+                    android:contentDescription="@string/content_desc_next"
+                    style="@style/Widget.App.Button.Primary" />
+
             </LinearLayout>
 
             <!-- Gradient border overlay -->
@@ -294,20 +304,6 @@
                 android:layout_gravity="center" />
 
         </com.google.android.material.card.MaterialCardView>
-
-        <!-- Next Button - pinned at bottom -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNext"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/button_top_margin"
-            android:text="@string/btn_next"
-            android:contentDescription="@string/content_desc_next"
-            style="@style/Widget.App.Button.Primary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardSecurity"
-            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
