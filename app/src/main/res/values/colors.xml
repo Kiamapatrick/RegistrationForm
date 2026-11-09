@@ -32,8 +32,8 @@
     <color name="inversePrimary">#A8C0E0</color>
 
     <!-- Glass tokens -->
-    <color name="glass_fill">#99FFFFFF</color>
-    <color name="glass_fill_strong">#B3FFFFFF</color>
+    <color name="glass_fill">#CCFFFFFF</color>
+    <color name="glass_fill_strong">#E6FFFFFF</color>
     <color name="glass_border_highlight">#FFFFFFFF</color>
     <color name="glass_border_shadow">#1A1B2A4A</color>
     <color name="glass_blob_1">#FFB3D9FF</color>

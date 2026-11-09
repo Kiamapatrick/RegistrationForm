@@ -32,8 +32,8 @@
     <color name="inversePrimary">#1B2A4A</color>
 
     <!-- Glass tokens - derived from dark surface with alpha -->
-    <color name="glass_fill">#8C222B3D</color>
-    <color name="glass_fill_strong">#A6222B3D</color>
+    <color name="glass_fill">#B3222B3D</color>
+    <color name="glass_fill_strong">#CC222B3D</color>
     <color name="glass_border_highlight">#33FFFFFF</color>
     <color name="glass_border_shadow">#1A000000</color>
     <color name="glass_blob_1">#FF8AB4FF</color>
