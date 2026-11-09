@@ -31,6 +31,15 @@
     <color name="inverseOnSurface">#1B2A4A</color>
     <color name="inversePrimary">#1B2A4A</color>
 
+    <!-- Glass tokens - derived from dark surface with alpha -->
+    <color name="glass_fill">#8C222B3D</color>
+    <color name="glass_fill_strong">#A6222B3D</color>
+    <color name="glass_border_highlight">#33FFFFFF</color>
+    <color name="glass_border_shadow">#1A000000</color>
+    <color name="glass_blob_1">#FF8AB4FF</color>
+    <color name="glass_blob_2">#FF6CC8D0</color>
+    <color name="glass_blob_3">#FFE8D08A</color>
+
     <!-- Strength colors -->
     <color name="strength_weak">#E8A0A0</color>
     <color name="strength_fair">#D4A843</color>

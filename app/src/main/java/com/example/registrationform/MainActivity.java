@@ -1,10 +1,17 @@
 package com.example.registrationform;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.animation.OvershootInterpolator;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
@@ -15,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.IntentCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -33,6 +41,10 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import androidx.dynamicanimation.animation.DynamicAnimation;
+import androidx.dynamicanimation.animation.SpringAnimation;
+import androidx.dynamicanimation.animation.SpringForce;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,15 +90,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        // Edge-to-edge insets handling
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            v.setPadding(
+                    systemBars.left,
+                    systemBars.top,
+                    systemBars.right,
+                    systemBars.bottom + ime.bottom
+            );
             return insets;
         });
 
         viewModel = new ViewModelProvider(this).get(RegistrationViewModel.class);
 
         initViews();
+        setupBlobLayer();
         setupDatePicker();
         setupTextWatchers();
         setupNextButton();
@@ -95,6 +116,34 @@ public class MainActivity extends AppCompatActivity {
 
         // Restore date picker listeners if picker is already showing (e.g., after rotation)
         restoreDatePickerIfShowing();
+
+        // Entrance animations
+        runEntranceAnimations();
+    }
+
+    private void setupBlobLayer() {
+        View blobLayer = findViewById(R.id.blobLayer);
+        if (blobLayer == null) return;
+
+        // Optional blur on API 31+
+        if (Build.VERSION.SDK_INT >= 31) {
+            boolean isPowerSave = false;
+            android.os.PowerManager pm = (android.os.PowerManager) getSystemService(POWER_SERVICE);
+            if (pm != null && pm.isPowerSaveMode()) {
+                // Skip blur in power save mode
+            } else if (isMotionReduced(this)) {
+                // Skip blur if motion reduced
+            } else {
+                try {
+                    var windowManager = (android.view.WindowManager) getSystemService(WINDOW_SERVICE);
+                    if (windowManager != null && windowManager.isCrossWindowBlurEnabled()) {
+                        blobLayer.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(80f, 80f, android.graphics.Shader.TileMode.CLAMP));
+                    }
+                } catch (Exception e) {
+                    // Blur not supported, skip
+                }
+            }
+        }
     }
 
     private void initViews() {
@@ -161,6 +210,19 @@ public class MainActivity extends AppCompatActivity {
                 .setSelection(defaultSelection)
                 .setCalendarConstraints(constraintsBuilder.build())
                 .build();
+
+        // Style the date picker dialog
+        if (Build.VERSION.SDK_INT >= 31) {
+            try {
+                var windowManager = (android.view.WindowManager) getSystemService(WINDOW_SERVICE);
+                if (windowManager != null && windowManager.isCrossWindowBlurEnabled()) {
+                    // Note: MaterialDatePicker doesn't directly expose window blur setting
+                    // This would require a custom dialog theme
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
 
         attachDatePickerListeners(datePicker);
 
@@ -315,6 +377,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupNextButton() {
+        // Spring press animation
+        btnNext.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                animateScaleSpring(v, 0.97f);
+                v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK);
+            } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                animateScaleSpring(v, 1.0f);
+            }
+            return false;
+        });
+
         btnNext.setOnClickListener(v -> {
             // Validate all fields on submit
             viewModel.setAllTouched();
@@ -386,7 +459,9 @@ public class MainActivity extends AppCompatActivity {
         // Observe password strength
         viewModel.getPasswordStrengthProgress().observe(this, progress -> {
             if (progress != null) {
-                passwordStrengthBar.setProgress(progress, true);
+                android.animation.ObjectAnimator.ofInt(passwordStrengthBar, "progress", progress)
+                        .setDuration(getResources().getInteger(R.integer.motion_duration_short))
+                        .start();
             }
         });
 
@@ -415,7 +490,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Observe form validity for button state
         viewModel.getIsFormValid().observe(this, isValid -> {
-            btnNext.setEnabled(Boolean.TRUE.equals(isValid));
+            boolean enabled = Boolean.TRUE.equals(isValid);
+            animateButtonState(btnNext, enabled);
         });
     }
 
@@ -510,5 +586,128 @@ public class MainActivity extends AppCompatActivity {
 
         passwordStrengthBar.setProgress(0, false);
         passwordStrengthLabel.setVisibility(View.GONE);
+    }
+
+    // Motion and Animation Helpers
+
+    private void runEntranceAnimations() {
+        if (isMotionReduced(this)) {
+            // Show immediately
+            findViewById(R.id.tvTitle).setAlpha(1f);
+            findViewById(R.id.tvSubtitle).setAlpha(1f);
+            findViewById(R.id.cardPersonal).setAlpha(1f);
+            findViewById(R.id.cardSecurity).setAlpha(1f);
+            findViewById(R.id.btnNext).setAlpha(1f);
+            return;
+        }
+
+        View header = findViewById(R.id.tvTitle);
+        View subtitle = findViewById(R.id.tvSubtitle);
+        View card1 = findViewById(R.id.cardPersonal);
+        View card2 = findViewById(R.id.cardSecurity);
+        View btn = findViewById(R.id.btnNext);
+
+        View[] views = {header, subtitle, findViewById(R.id.cardPersonal), findViewById(R.id.cardSecurity), btnNext};
+        int stagger = getResources().getInteger(R.integer.motion_duration_entrance_stagger);
+
+        for (int i = 0; i < views.length; i++) {
+            View view = views[i];
+            if (view == null) continue;
+            view.setAlpha(0f);
+            view.setTranslationY(24f);
+            view.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(getResources().getInteger(R.integer.motion_duration_medium))
+                    .setStartDelay(i * stagger)
+                    .setInterpolator(new OvershootInterpolator(1.2f))
+                    .start();
+        }
+    }
+
+    private void animateButtonState(MaterialButton button, boolean enabled) {
+        if (isMotionReduced(this)) {
+            button.setEnabled(enabled);
+            button.setAlpha(enabled ? 1f : 0.38f);
+            return;
+        }
+
+        button.setEnabled(enabled);
+        button.animate()
+                .alpha(enabled ? 1f : 0.38f)
+                .setDuration(getResources().getInteger(R.integer.motion_duration_short))
+                .setInterpolator(new OvershootInterpolator(1.2f))
+                .start();
+
+        // Pulse once when first becoming valid
+        // Note: In a real implementation, you'd track if this is the first time becoming valid
+    }
+
+    /**
+     * Checks if motion is reduced via system settings or power save mode.
+     */
+    private boolean isMotionReduced(Context context) {
+        float scale = Settings.Global.getFloat(context.getContentResolver(),
+                Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
+        if (scale == 0f) {
+            return true;
+        }
+
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        if (pm != null && pm.isPowerSaveMode()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static final float SPRING_DAMPING_RATIO = 0.7f;
+
+    /**
+     * Animates view scale with a spring.
+     */
+    private void animateScaleSpring(View view, float targetScale) {
+        if (isMotionReduced(this)) {
+            view.setScaleX(targetScale);
+            view.setScaleY(targetScale);
+            return;
+        }
+
+        SpringForce springForce = new SpringForce(targetScale);
+        springForce.setStiffness(getResources().getInteger(R.integer.spring_stiffness));
+        springForce.setDampingRatio(SPRING_DAMPING_RATIO);
+
+        SpringAnimation scaleX = new SpringAnimation(view, DynamicAnimation.SCALE_X);
+        SpringAnimation scaleY = new SpringAnimation(view, DynamicAnimation.SCALE_Y);
+
+        scaleX.setSpring(springForce);
+        scaleY.setSpring(springForce);
+
+        scaleX.start();
+        scaleY.start();
+    }
+
+    /**
+     * Animates view scale with a spring (for button press).
+     */
+    private void animateScaleSpring(View view, float targetScale, float stiffness, float dampingRatio) {
+        if (isMotionReduced(this)) {
+            view.setScaleX(targetScale);
+            view.setScaleY(targetScale);
+            return;
+        }
+
+        SpringForce springForce = new SpringForce(targetScale);
+        springForce.setStiffness(stiffness);
+        springForce.setDampingRatio(dampingRatio);
+
+        SpringAnimation scaleX = new SpringAnimation(view, DynamicAnimation.SCALE_X);
+        SpringAnimation scaleY = new SpringAnimation(view, DynamicAnimation.SCALE_Y);
+
+        scaleX.setSpring(springForce);
+        scaleY.setSpring(springForce);
+
+        scaleX.start();
+        scaleY.start();
     }
 }

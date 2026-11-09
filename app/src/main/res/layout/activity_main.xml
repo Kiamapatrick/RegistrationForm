@@ -17,6 +17,19 @@
         android:paddingTop="@dimen/screen_padding_top"
         android:paddingBottom="@dimen/screen_padding">
 
+        <!-- Background blob layer (bleeds under system bars) -->
+        <ImageView
+            android:id="@+id/blobLayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/glass_blob_layer"
+            android:alpha="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <!-- Header Block -->
         <TextView
             android:id="@+id/tvTitle"
@@ -39,203 +52,240 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-        <!-- Section: Personal Details -->
-        <TextView
-            android:id="@+id/tvSectionPersonal"
+        <!-- Section: Personal Details (Glass Card) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardPersonal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/section_spacing"
-            android:text="@string/section_personal_details"
-            android:textAppearance="@style/TextAppearance.App.SectionLabel"
+            style="@style/Widget.App.GlassCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
 
-        <!-- Name Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/section_label_spacing"
-            android:hint="@string/hint_full_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSectionPersonal"
-            style="@style/Widget.App.TextInputLayout"
-            app:startIconDrawable="@drawable/ic_person"
-            app:startIconContentDescription="@string/content_desc_name"
-            app:errorEnabled="true">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etName"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName|textCapWords"
-                android:imeOptions="actionNext"
-                android:maxLines="1"
-                android:contentDescription="@string/content_desc_name" />
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <!-- Section Label -->
+                <TextView
+                    android:id="@+id/tvSectionPersonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/section_personal_details"
+                    android:textAppearance="@style/TextAppearance.App.SectionLabel" />
 
-        <!-- Date of Birth Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDob"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/field_spacing"
-            android:hint="@string/hint_date_of_birth"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilName"
-            style="@style/Widget.App.TextInputLayout"
-            app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_calendar"
-            app:endIconContentDescription="@string/content_desc_calendar"
-            app:errorEnabled="true">
+                <!-- Name Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/section_label_spacing"
+                    android:hint="@string/hint_full_name"
+                    style="@style/Widget.App.TextInputLayout.Glass"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:startIconContentDescription="@string/content_desc_name"
+                    app:startIconTint="@color/text_input_icon_tint"
+                    app:errorEnabled="true">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDob"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName|textCapWords"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"
+                        android:contentDescription="@string/content_desc_name" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Date of Birth Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilDob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/field_spacing"
+                    android:hint="@string/hint_date_of_birth"
+                    style="@style/Widget.App.TextInputLayout.Glass"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/ic_calendar"
+                    app:endIconContentDescription="@string/content_desc_calendar"
+                    app:endIconTint="@color/text_input_icon_tint"
+                    app:errorEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDob"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:inputType="none"
+                        android:maxLines="1"
+                        android:contentDescription="@string/content_desc_dob" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <!-- Gradient border overlay -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:clickable="true"
-                android:cursorVisible="false"
-                android:inputType="none"
-                android:maxLines="1"
-                android:contentDescription="@string/content_desc_dob" />
+                android:layout_height="match_parent"
+                android:background="@drawable/glass_card_border"
+                android:layout_gravity="center" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Section: Account Security -->
-        <TextView
-            android:id="@+id/tvSectionSecurity"
+        <!-- Section: Account Security (Glass Card) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSecurity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/section_spacing"
-            android:text="@string/section_account_security"
-            android:textAppearance="@style/TextAppearance.App.SectionLabel"
+            style="@style/Widget.App.GlassCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilDob" />
+            app:layout_constraintTop_toBottomOf="@id/cardPersonal">
 
-        <!-- Email Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilEmail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/section_label_spacing"
-            android:hint="@string/hint_email"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSectionSecurity"
-            style="@style/Widget.App.TextInputLayout"
-            app:startIconDrawable="@drawable/ic_email"
-            app:startIconContentDescription="@string/content_desc_email"
-            app:errorEnabled="true">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:imeOptions="actionNext"
-                android:maxLines="1"
-                android:contentDescription="@string/content_desc_email" />
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <!-- Section Label -->
+                <TextView
+                    android:id="@+id/tvSectionSecurity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/section_account_security"
+                    android:textAppearance="@style/TextAppearance.App.SectionLabel" />
 
-        <!-- Password Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPassword"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/field_spacing"
-            android:hint="@string/hint_password"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilEmail"
-            style="@style/Widget.App.TextInputLayout"
-            app:startIconDrawable="@drawable/ic_lock"
-            app:startIconContentDescription="@string/content_desc_password"
-            app:endIconMode="password_toggle"
-            app:errorEnabled="true">
+                <!-- Email Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/section_label_spacing"
+                    android:hint="@string/hint_email"
+                    style="@style/Widget.App.TextInputLayout.Glass"
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:startIconContentDescription="@string/content_desc_email"
+                    app:startIconTint="@color/text_input_icon_tint"
+                    app:errorEnabled="true">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"
+                        android:contentDescription="@string/content_desc_email" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/field_spacing"
+                    android:hint="@string/hint_password"
+                    style="@style/Widget.App.TextInputLayout.Glass"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:startIconContentDescription="@string/content_desc_password"
+                    app:startIconTint="@color/text_input_icon_tint"
+                    app:endIconMode="password_toggle"
+                    app:endIconTint="@color/text_input_icon_tint"
+                    app:errorEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"
+                        android:autofillHints="newPassword"
+                        android:contentDescription="@string/content_desc_password" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Strength Indicator -->
+                <LinearLayout
+                    android:id="@+id/passwordStrengthContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/strength_margin_top"
+                    android:layout_marginStart="@dimen/screen_padding"
+                    android:layout_marginEnd="@dimen/screen_padding"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"
+                    android:importantForAccessibility="yes">
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/passwordStrengthBar"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/strength_track_height"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/strength_label_margin"
+                        style="@style/Widget.App.StrengthBar"
+                        android:contentDescription="@string/password_strength_content_desc"
+                        android:importantForAccessibility="yes" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/passwordStrengthLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.App.Caption"
+                        android:contentDescription="@string/password_strength_content_desc"
+                        android:accessibilityLiveRegion="polite"
+                        tools:text="Weak" />
+
+                </LinearLayout>
+
+                <!-- Confirm Password Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/field_spacing"
+                    android:hint="@string/hint_confirm_password"
+                    style="@style/Widget.App.TextInputLayout.Glass"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:startIconContentDescription="@string/content_desc_confirm_password"
+                    app:startIconTint="@color/text_input_icon_tint"
+                    app:endIconMode="password_toggle"
+                    app:endIconTint="@color/text_input_icon_tint"
+                    app:errorEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etConfirmPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionDone"
+                        android:maxLines="1"
+                        android:autofillHints="newPassword"
+                        android:contentDescription="@string/content_desc_confirm_password" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <!-- Gradient border overlay -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:imeOptions="actionNext"
-                android:maxLines="1"
-                android:autofillHints="newPassword"
-                android:contentDescription="@string/content_desc_password" />
+                android:layout_height="match_parent"
+                android:background="@drawable/glass_card_border"
+                android:layout_gravity="center" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Password Strength Indicator -->
-        <LinearLayout
-            android:id="@+id/passwordStrengthContainer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/strength_margin_top"
-            android:layout_marginStart="@dimen/screen_padding"
-            android:layout_marginEnd="@dimen/screen_padding"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilPassword"
-            android:importantForAccessibility="yes">
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/passwordStrengthBar"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/strength_track_height"
-                android:layout_weight="1"
-                android:layout_marginEnd="@dimen/strength_label_margin"
-                style="@style/Widget.App.StrengthBar"
-                android:contentDescription="@string/password_strength_content_desc"
-                android:importantForAccessibility="yes" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/passwordStrengthLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.App.Caption"
-                android:contentDescription="@string/password_strength_content_desc"
-                android:accessibilityLiveRegion="polite"
-                tools:text="Weak" />
-
-        </LinearLayout>
-
-        <!-- Confirm Password Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilConfirmPassword"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/field_spacing"
-            android:hint="@string/hint_confirm_password"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/passwordStrengthContainer"
-            style="@style/Widget.App.TextInputLayout"
-            app:startIconDrawable="@drawable/ic_lock"
-            app:startIconContentDescription="@string/content_desc_confirm_password"
-            app:endIconMode="password_toggle"
-            app:errorEnabled="true">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etConfirmPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:imeOptions="actionDone"
-                android:maxLines="1"
-                android:autofillHints="newPassword"
-                android:contentDescription="@string/content_desc_confirm_password" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Next Button - pinned at bottom -->
         <com.google.android.material.button.MaterialButton
@@ -248,7 +298,7 @@
             style="@style/Widget.App.Button.Primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilConfirmPassword"
+            app:layout_constraintTop_toBottomOf="@id/cardSecurity"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

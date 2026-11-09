@@ -21,20 +21,20 @@
     <dimen name="section_label_spacing">12dp</dimen>
 
     <!-- Corner radius -->
-    <dimen name="corner_radius">12dp</dimen>
-    <dimen name="button_radius">12dp</dimen>
-    <dimen name="card_radius">16dp</dimen>
+    <dimen name="corner_radius">16dp</dimen>
+    <dimen name="button_radius">16dp</dimen>
+    <dimen name="card_radius">24dp</dimen>
 
     <!-- Button -->
     <dimen name="button_height">56dp</dimen>
 
     <!-- Text sizes -->
-    <dimen name="text_size_title">28sp</dimen>
+    <dimen name="text_size_title">34sp</dimen>
     <dimen name="text_size_subtitle">14sp</dimen>
     <dimen name="text_size_button">16sp</dimen>
     <dimen name="text_size_section_label">14sp</dimen>
     <dimen name="text_size_body">16sp</dimen>
-    <dimen name="text_size_caption">12sp</dimen>
+    <dimen name="text_size_caption">14sp</dimen>
 
     <!-- Stroke widths -->
     <dimen name="stroke_hairline">1dp</dimen>
@@ -44,4 +44,12 @@
     <!-- Strength bar -->
     <dimen name="strength_track_height">3dp</dimen>
     <dimen name="strength_track_thickness">3dp</dimen>
+
+    <!-- Glass -->
+    <dimen name="glass_border_width">1dp</dimen>
+    <dimen name="glass_shadow_radius">24dp</dimen>
+    <dimen name="glass_shadow_offset_y">8dp</dimen>
+
+    <!-- Spring damping ratio (float) -->
+    <item name="spring_damping" format="float" type="dimen">0.7</item>
 </resources>

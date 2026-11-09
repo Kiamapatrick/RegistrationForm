@@ -31,6 +31,15 @@
     <color name="inverseOnSurface">#F0F4F8</color>
     <color name="inversePrimary">#A8C0E0</color>
 
+    <!-- Glass tokens -->
+    <color name="glass_fill">#99FFFFFF</color>
+    <color name="glass_fill_strong">#B3FFFFFF</color>
+    <color name="glass_border_highlight">#FFFFFFFF</color>
+    <color name="glass_border_shadow">#1A1B2A4A</color>
+    <color name="glass_blob_1">#FFB3D9FF</color>
+    <color name="glass_blob_2">#FF80D4E8</color>
+    <color name="glass_blob_3">#FFFFE8BF</color>
+
     <!-- Strength colors -->
     <color name="strength_weak">#8B1A1A</color>
     <color name="strength_fair">#855F00</color>
